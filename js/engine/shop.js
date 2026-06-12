@@ -131,6 +131,7 @@ export function venderCoringa(state, indice) {
 }
 
 export function reordenarCoringas(state, de, para) {
+  if (de < 0 || de >= state.coringas.length) return;
   const [coringa] = state.coringas.splice(de, 1);
   state.coringas.splice(para, 0, coringa);
 }

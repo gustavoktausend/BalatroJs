@@ -3,8 +3,7 @@ import { criarRun } from "../js/state.js";
 import { novoCoringa, CORINGAS } from "../js/data/jokers.js";
 import {
   gerarLoja, comprarItem, rerolar, comprarPacote, escolherDoPacote,
-  pularPacote, venderCoringa, reordenarCoringas,
-  MAX_CORINGAS, MAX_CONSUMIVEIS, PRECO_PACOTE,
+  pularPacote, venderCoringa, reordenarCoringas, PRECO_PACOTE,
 } from "../js/engine/shop.js";
 
 function comLoja(semente = 1) {

@@ -41,7 +41,7 @@ export function carregar() {
     if (!bruto) return null;
     const dados = JSON.parse(bruto);
     if (dados.versao !== VERSAO_SAVE) return null;
-    dados.coringas = dados.coringas.map(({ id, dados: d }) => ({ id, dados: d, def: CORINGAS[id] }));
+    dados.coringas = dados.coringas.map(({ id, dados: d }) => ({ id, dados: d, def: CORINGAS[id] })).filter((c) => c.def !== undefined);
     return dados;
   } catch {
     return null;
