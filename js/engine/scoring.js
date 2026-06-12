@@ -21,6 +21,7 @@ export function pontuarJogada(state, cartas) {
 
   const aplicar = (efeito, origem) => {
     if (!efeito) return;
+    if (!efeito.chips && !efeito.mult && (!efeito.xmult || efeito.xmult === 1)) return;
     if (efeito.chips) chips += efeito.chips;
     if (efeito.mult) mult += efeito.mult;
     if (efeito.xmult && efeito.xmult !== 1) mult = +(mult * efeito.xmult).toFixed(2);

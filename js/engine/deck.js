@@ -23,7 +23,7 @@ export function chipsDaCarta(carta) {
 const ROTULOS = { 11: "J", 12: "Q", 13: "K", 14: "A" };
 
 export function rotuloDaCarta(carta) {
-  return ROTULOS[carta.valor] || String(carta.valor);
+  return ROTULOS[carta.valor] ?? String(carta.valor);
 }
 
 export function ehFigura(carta) {
