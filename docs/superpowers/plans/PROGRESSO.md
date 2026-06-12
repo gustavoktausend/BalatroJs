@@ -2,7 +2,7 @@
 
 Atualizado em: 2026-06-12
 Plano: `docs/superpowers/plans/2026-06-12-balatro-v1.md` (16 tarefas, código completo em cada uma)
-Branch: `feature/v1` | Workflow: superpowers:subagent-driven-development
+Branch: `main` (feature/v1 mergeada e apagada em 2026-06-12) | Workflow: superpowers:subagent-driven-development
 (implementador haiku por tarefa → revisor spec+qualidade sonnet → fixes se necessário)
 
 ## Concluídas (implementadas + revisadas + aprovadas)
@@ -27,11 +27,19 @@ Branch: `feature/v1` | Workflow: superpowers:subagent-driven-development
 Testes atuais: `node tests/todos.js` → **71 teste(s), 0 falha(s)**
 (os totais previstos no plano valem +1 a partir da Task 3, por causa do teste golden extra do RNG)
 
-## Pendentes (na ordem)
+- [x] Revisão final do conjunto (opus): READY TO MERGE, 0 issues bloqueantes; 3 minors anotados abaixo
+- [x] Merge fast-forward em `main` (testes 71/0 no resultado), branch feature/v1 apagada
 
-- [ ] Revisão final do conjunto (subagente opus) + superpowers:finishing-a-development-branch (merge em main)
-- [ ] Deploy GitHub Pages (ação do usuário: criar repo no GitHub, push, Settings→Pages → main/(root); depois trocar SEU-USUARIO no README)
+## Pendentes (ação do usuário)
+
+- [ ] Deploy GitHub Pages: criar repo no GitHub, push da main, Settings→Pages → main/(root); depois trocar SEU-USUARIO no README
 - [ ] Verificação visual no navegador (não há browser neste ambiente; roteiro no Step 2 da Task 16 do plano)
+
+## Minors da revisão final (para milestone futura, não bloqueiam)
+
+1. Google Fonts é a única referência externa do app (degrada para fontes do sistema offline) — documentar ou self-hostear.
+2. `vencerBlind` devolve `recompensa` mas a UI não mostra um aviso "+$N" ao vencer a blind.
+3. `descricaoCoringa` usa `if` encadeado sem `else`: coringa hipotético com dois campos de `dados` mostraria só o último sufixo.
 
 ## Convenções (não esquecer nos prompts dos subagentes)
 
