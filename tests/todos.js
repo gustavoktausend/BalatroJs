@@ -6,6 +6,7 @@ import "./economy.test.js";
 import "./blinds.test.js";
 import "./data.test.js";
 import "./scoring.test.js";
+import "./state.test.js";
 
 // Os arquivos *.test.js são adicionados aqui conforme as tarefas avançam.
 
