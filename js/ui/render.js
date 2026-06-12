@@ -1,4 +1,11 @@
+import { app, atualizar } from "../app.js";
 import { NAIPES_VERMELHOS, SIMBOLO_NAIPE, rotuloDaCarta } from "../engine/deck.js";
+import { MAOS } from "../data/hands.js";
+import { PLANETAS } from "../data/planets.js";
+import { precoVenda } from "../engine/economy.js";
+import { venderCoringa, reordenarCoringas, MAX_CORINGAS, MAX_CONSUMIVEIS } from "../engine/shop.js";
+import { usarPlaneta } from "../engine/run.js";
+import { ligarTooltip } from "./tooltip.js";
 
 // Criador de elementos: el("div", { classe: "x", onclick: fn, dataset: {...} }, ...filhos)
 export function el(tag, atributos = {}, ...filhos) {
@@ -49,4 +56,84 @@ export function avisar(codigo) {
   document.getElementById("aviso")?.remove();
   document.body.append(el("div", { id: "aviso" }, MENSAGENS[codigo] || codigo));
   setTimeout(() => document.getElementById("aviso")?.remove(), 1900);
+}
+
+// indice = null exibe sem interação (loja/pacote); com índice, permite vender e arrastar.
+export function elementoCoringa(coringa, indice = null) {
+  const def = coringa.def;
+  const elemento = el("div", { classe: `coringa raridade-${def.raridade}` },
+    el("span", { classe: "nome" }, def.nome),
+  );
+  ligarTooltip(elemento,
+    `<strong>${def.nome}</strong><br>${descricaoCoringa(coringa)}<br><em>${def.raridade} — venda $${precoVenda(def.preco)}</em>`);
+
+  if (indice === null) return elemento;
+
+  elemento.addEventListener("click", () => {
+    const existente = elemento.querySelector(".vender");
+    if (existente) { existente.remove(); return; }
+    elemento.append(el("button", {
+      classe: "botao botao-vermelho botao-mini vender",
+      onclick: (evento) => {
+        evento.stopPropagation();
+        venderCoringa(app.state, indice);
+        atualizar();
+      },
+    }, `Vender $${precoVenda(def.preco)}`));
+  });
+
+  elemento.draggable = true;
+  elemento.addEventListener("dragstart", (evento) => evento.dataTransfer.setData("text/plain", String(indice)));
+  elemento.addEventListener("dragover", (evento) => evento.preventDefault());
+  elemento.addEventListener("drop", (evento) => {
+    evento.preventDefault();
+    const origem = Number(evento.dataTransfer.getData("text/plain"));
+    if (Number.isInteger(origem) && origem !== indice) {
+      reordenarCoringas(app.state, origem, indice);
+      atualizar();
+    }
+  });
+  return elemento;
+}
+
+function descricaoCoringa(coringa) {
+  const dados = coringa.dados;
+  let extra = "";
+  if (dados.mult !== undefined) extra = ` (atual: +${dados.mult})`;
+  if (dados.x !== undefined) extra = ` (atual: ×${dados.x})`;
+  if (dados.valor !== undefined) extra = ` (atual: $${dados.valor})`;
+  return coringa.def.descricao + extra;
+}
+
+export function elementoConsumivel(planetaId, indice = null) {
+  const planeta = PLANETAS[planetaId];
+  const elemento = el("div", { classe: "consumivel" }, el("span", {}, planeta.nome));
+  const nivel = app.state ? app.state.niveisMaos[planeta.mao] : 1;
+  ligarTooltip(elemento,
+    `<strong>${planeta.nome}</strong><br>Sobe o nível de ${MAOS[planeta.mao].nome} (nível atual: ${nivel})`);
+  if (indice !== null) {
+    elemento.addEventListener("click", () => {
+      usarPlaneta(app.state, indice);
+      atualizar();
+    });
+  }
+  return elemento;
+}
+
+export function fileiraCoringas(state) {
+  const fileira = el("div", { classe: "coringas" });
+  state.coringas.forEach((coringa, i) => fileira.append(elementoCoringa(coringa, i)));
+  for (let i = state.coringas.length; i < MAX_CORINGAS; i++) {
+    fileira.append(el("div", { classe: "slot-vazio" }));
+  }
+  return fileira;
+}
+
+export function fileiraConsumiveis(state) {
+  const fileira = el("div", { classe: "consumiveis" });
+  state.consumiveis.forEach((id, i) => fileira.append(elementoConsumivel(id, i)));
+  for (let i = state.consumiveis.length; i < MAX_CONSUMIVEIS; i++) {
+    fileira.append(el("div", { classe: "slot-vazio" }));
+  }
+  return fileira;
 }

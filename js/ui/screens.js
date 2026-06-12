@@ -1,10 +1,14 @@
 import { app, atualizar } from "../app.js";
 import { criarRun, carregar } from "../state.js";
-import { el, cabecalhoRun } from "./render.js";
+import { el, cabecalhoRun, elementoCarta, fileiraCoringas, fileiraConsumiveis, avisar } from "./render.js";
 import { CHEFES } from "../data/bosses.js";
 import { alvoDaBlind, chefeDoAnte } from "../engine/blinds.js";
 import { PREMIOS } from "../engine/economy.js";
-import { iniciarBlind, pularBlind } from "../engine/run.js";
+import { iniciarBlind, pularBlind, jogar, descartar, ordenarMao } from "../engine/run.js";
+import { MAOS, valoresDaMao } from "../data/hands.js";
+import { detectarMao } from "../engine/poker.js";
+import { NAIPES, SIMBOLO_NAIPE, rotuloDaCarta } from "../engine/deck.js";
+import { animarJogada } from "./animate.js";
 
 export function mostrarTela(state) {
   const fase = state ? state.fase : "titulo";
@@ -66,7 +70,126 @@ function cartaoBlind(state, tipo) {
 }
 
 // ── Telas preenchidas nas Tasks 14 e 15 ─────────────────
-function renderRodada(state) {}
+let selecao = new Set();
+
+function renderRodada(state) {
+  selecao = new Set();
+  const rodada = state.rodada;
+  const secao = secaoDe("rodada");
+  secao.replaceChildren(
+    el("aside", { classe: "lateral" }, ...painelLateral(state)),
+    el("div", { classe: "mesa" },
+      el("div", { classe: "topo" }, fileiraCoringas(state), fileiraConsumiveis(state)),
+      el("div", { classe: "centro", id: "area-jogada" }),
+      el("div", { classe: "base" },
+        el("div", { classe: "mao" }, ...rodada.mao.map((carta, i) => cartaDaMao(state, carta, i))),
+        el("div", { classe: "controles" },
+          el("button", { id: "btn-jogar", classe: "botao botao-azul", disabled: "", onclick: () => aoJogar(state) }, "Jogar"),
+          el("button", { id: "btn-descartar", classe: "botao botao-vermelho", disabled: "", onclick: () => aoDescartar(state) }, "Descartar"),
+          el("button", { classe: "botao botao-mini", onclick: () => { ordenarMao(state, "valor"); atualizar(); } }, "Valor"),
+          el("button", { classe: "botao botao-mini", onclick: () => { ordenarMao(state, "naipe"); atualizar(); } }, "Naipe"),
+          el("button", { classe: "botao botao-mini", onclick: () => mostrarBaralho(state) }, `Baralho: ${rodada.baralho.length}`),
+        ),
+      ),
+    ),
+  );
+}
+
+function painelLateral(state) {
+  const rodada = state.rodada;
+  const blind = state.blindAtual;
+  const titulo = blind.tipo === "chefe" ? CHEFES[blind.chefeId].nome : NOME_BLIND[blind.tipo];
+  return [
+    el("div", { classe: "painel-blind" },
+      el("h3", {}, titulo),
+      blind.tipo === "chefe" ? el("p", { classe: "descricao" }, CHEFES[blind.chefeId].descricao) : null,
+      el("p", {}, "Alvo: ", el("span", { classe: "numero" }, blind.alvo.toLocaleString("pt-BR"))),
+    ),
+    el("div", { classe: "painel-pontuacao" },
+      el("p", {}, "Rodada: ", el("span", { classe: "numero" }, rodada.pontuacao.toLocaleString("pt-BR"))),
+      el("div", { id: "previa-mao" }),
+    ),
+    el("p", {},
+      "Mãos: ", el("span", { classe: "numero chips" }, String(rodada.maosRestantes)),
+      " · Descartes: ", el("span", { classe: "numero mult" }, String(rodada.descartesRestantes)),
+    ),
+    el("p", { classe: "numero dinheiro" }, `$${state.dinheiro}`),
+    el("p", {}, `Ante ${state.ante}/8`),
+  ];
+}
+
+function cartaDaMao(state, carta, indice) {
+  const elemento = elementoCarta(carta);
+  elemento.addEventListener("click", () => {
+    if (selecao.has(indice)) {
+      selecao.delete(indice);
+      elemento.classList.remove("selecionada");
+    } else if (selecao.size < 5) {
+      selecao.add(indice);
+      elemento.classList.add("selecionada");
+    }
+    atualizarControles(state);
+  });
+  return elemento;
+}
+
+function atualizarControles(state) {
+  const rodada = state.rodada;
+  document.getElementById("btn-jogar").disabled = selecao.size === 0 || rodada.maosRestantes === 0;
+  document.getElementById("btn-descartar").disabled = selecao.size === 0 || rodada.descartesRestantes === 0;
+  const previa = document.getElementById("previa-mao");
+  if (selecao.size === 0) {
+    previa.replaceChildren();
+    return;
+  }
+  const jogada = detectarMao([...selecao].map((i) => rodada.mao[i]));
+  const nivel = state.niveisMaos[jogada.tipo];
+  const { chips, mult } = valoresDaMao(jogada.tipo, nivel);
+  previa.innerHTML =
+    `<span class="nome-mao">${MAOS[jogada.tipo].nome} <small>nv. ${nivel}</small></span>` +
+    `<span class="numero chips">${chips}</span> × <span class="numero mult">${mult}</span>`;
+}
+
+async function aoJogar(state) {
+  const indices = [...selecao];
+  const cartas = indices.map((i) => state.rodada.mao[i]);
+  const resultado = jogar(state, indices);
+  if (resultado.erro) {
+    avisar(resultado.erro);
+    return;
+  }
+  document.getElementById("btn-jogar").disabled = true;
+  document.getElementById("btn-descartar").disabled = true;
+  await animarJogada(cartas, resultado.eventos, document.getElementById("area-jogada"));
+  atualizar();
+}
+
+function aoDescartar(state) {
+  const resultado = descartar(state, [...selecao]);
+  if (resultado.erro) {
+    avisar(resultado.erro);
+    return;
+  }
+  atualizar();
+}
+
+function mostrarBaralho(state) {
+  const overlay = el("div", { classe: "overlay", onclick: () => overlay.remove() },
+    el("div", { classe: "painel-baralho" },
+      el("h3", {}, `Cartas restantes (${state.rodada.baralho.length})`),
+      ...NAIPES.map((naipe) => el("p", {},
+        `${SIMBOLO_NAIPE[naipe]} `,
+        state.rodada.baralho
+          .filter((c) => c.naipe === naipe)
+          .sort((a, b) => b.valor - a.valor)
+          .map(rotuloDaCarta)
+          .join(" "),
+      )),
+    ),
+  );
+  document.body.append(overlay);
+}
+
 function renderLoja(state) {}
 function renderPacote(state) {}
 function renderFim(state) {}
