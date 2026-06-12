@@ -1,6 +1,8 @@
 import { app, atualizar } from "../app.js";
 import { criarRun, carregar } from "../state.js";
-import { el, cabecalhoRun, elementoCarta, fileiraCoringas, fileiraConsumiveis, avisar } from "./render.js";
+import { el, cabecalhoRun, elementoCarta, fileiraCoringas, fileiraConsumiveis, avisar, elementoCoringa, elementoConsumivel } from "./render.js";
+import { novoCoringa } from "../data/jokers.js";
+import { comprarItem, comprarPacote, rerolar, escolherDoPacote, pularPacote, PRECO_PACOTE } from "../engine/shop.js";
 import { CHEFES } from "../data/bosses.js";
 import { alvoDaBlind, chefeDoAnte } from "../engine/blinds.js";
 import { PREMIOS } from "../engine/economy.js";
@@ -190,9 +192,90 @@ function mostrarBaralho(state) {
   document.body.append(overlay);
 }
 
-function renderLoja(state) {}
-function renderPacote(state) {}
-function renderFim(state) {}
+function renderLoja(state) {
+  const secao = secaoDe("loja");
+  secao.replaceChildren(
+    el("h2", { classe: "logo" }, "Loja"),
+    cabecalhoRun(state),
+    el("div", { classe: "topo" }, fileiraCoringas(state), fileiraConsumiveis(state)),
+    el("div", { classe: "itens-loja" },
+      ...state.loja.itens.map((item, i) => (item ? cartaoItem(state, item, i) : el("div", { classe: "slot-vazio" }))),
+      cartaoPacote(state),
+    ),
+    el("div", { classe: "controles" },
+      el("button", {
+        classe: "botao",
+        onclick: () => { const r = rerolar(state); if (r.erro) avisar(r.erro); atualizar(); },
+      }, `Re-rolar $${state.loja.precoRerolar}`),
+      el("button", {
+        classe: "botao botao-azul",
+        onclick: () => { state.loja = null; state.fase = "selecao-blind"; atualizar(); },
+      }, "Próxima rodada"),
+    ),
+  );
+}
+
+function cartaoItem(state, item, indice) {
+  const corpo = item.tipo === "coringa"
+    ? elementoCoringa(novoCoringa(item.id))
+    : elementoConsumivel(item.id);
+  return el("div", { classe: "cartao-item" },
+    corpo,
+    el("button", {
+      classe: "botao botao-azul",
+      onclick: () => { const r = comprarItem(state, indice); if (r.erro) avisar(r.erro); else atualizar(); },
+    }, `Comprar $${item.preco}`),
+  );
+}
+
+function cartaoPacote(state) {
+  return el("div", { classe: "cartao-item" },
+    el("div", { classe: "consumivel" }, el("span", {}, "Pacote-surpresa")),
+    el("button", {
+      classe: "botao botao-azul",
+      disabled: state.loja.pacoteAberto,
+      onclick: () => { const r = comprarPacote(state); if (r.erro) avisar(r.erro); else atualizar(); },
+    }, state.loja.pacoteAberto ? "Aberto" : `Abrir $${PRECO_PACOTE}`),
+  );
+}
+
+function renderPacote(state) {
+  const secao = secaoDe("pacote");
+  secao.replaceChildren(
+    el("h2", { classe: "logo" }, state.pacote.tipo === "planeta" ? "Pacote Celestial" : "Pacote de Coringas"),
+    el("p", { classe: "subtitulo" }, "Escolha 1"),
+    el("div", { classe: "itens-loja" },
+      ...state.pacote.opcoes.map((id, i) =>
+        el("div", { classe: "cartao-item" },
+          state.pacote.tipo === "planeta" ? elementoConsumivel(id) : elementoCoringa(novoCoringa(id)),
+          el("button", {
+            classe: "botao botao-azul",
+            onclick: () => { const r = escolherDoPacote(state, i); if (r.erro) avisar(r.erro); else atualizar(); },
+          }, "Escolher"),
+        ),
+      ),
+    ),
+    el("button", { classe: "botao", onclick: () => { pularPacote(state); atualizar(); } }, "Pular"),
+  );
+}
+
+function renderFim(state) {
+  const secao = secaoDe("fim");
+  const maisJogada = Object.entries(state.estatisticas.porMao).sort((a, b) => b[1] - a[1])[0];
+  secao.replaceChildren(
+    el("h1", { classe: "logo" }, state.vitoria ? "Vitória!" : "Fim de run"),
+    el("div", { classe: "estatisticas" },
+      el("p", {}, `Ante alcançado: ${state.ante}`),
+      el("p", {}, `Rodadas vencidas: ${state.estatisticas.rodadas}`),
+      el("p", {}, "Melhor jogada: ", el("span", { classe: "numero" }, state.estatisticas.melhorJogada.toLocaleString("pt-BR"))),
+      el("p", {}, maisJogada
+        ? `Mão mais jogada: ${MAOS[maisJogada[0]].nome} (${maisJogada[1]}×)`
+        : "Nenhuma mão jogada"),
+    ),
+    el("button", { classe: "botao botao-azul", onclick: () => { app.state = criarRun(); atualizar(); } }, "Nova run"),
+    el("button", { classe: "botao", onclick: () => { app.state = null; atualizar(); } }, "Menu"),
+  );
+}
 
 const RENDERS = {
   "titulo": renderTitulo,
