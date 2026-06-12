@@ -8,6 +8,7 @@ if (!ehNavegador && typeof globalThis.localStorage === "undefined") {
     getItem: (chave) => (dados.has(chave) ? dados.get(chave) : null),
     setItem: (chave, valor) => dados.set(chave, String(valor)),
     removeItem: (chave) => dados.delete(chave),
+    clear: () => dados.clear(),
   };
 }
 
@@ -32,7 +33,7 @@ export function teste(nome, fn) {
     registrar(`✔ ${nome}`, "ok");
   } catch (erro) {
     falhas += 1;
-    registrar(`✘ ${nome} — ${erro.message}`, "falha");
+    registrar(`✘ ${nome} — ${erro?.message ?? String(erro)}`, "falha");
   }
 }
 
