@@ -1,0 +1,38 @@
+// Detecta a melhor mão de pôquer entre 1 a 5 cartas selecionadas.
+// Retorna { tipo, cartasQuePontuam, real } — "real" só interessa na sequência de naipe.
+export function detectarMao(cartas) {
+  const contagem = new Map();
+  for (const c of cartas) contagem.set(c.valor, (contagem.get(c.valor) || 0) + 1);
+  const grupos = [...contagem.entries()]
+    .map(([valor, qtd]) => ({ valor, qtd }))
+    .sort((a, b) => b.qtd - a.qtd || b.valor - a.valor);
+
+  const flush = cartas.length === 5 && cartas.every((c) => c.naipe === cartas[0].naipe);
+  const sequencia = ehSequencia(cartas);
+  const dosGrupos = (n) => {
+    const valores = new Set(grupos.slice(0, n).map((g) => g.valor));
+    return cartas.filter((c) => valores.has(c.valor));
+  };
+
+  if (flush && sequencia) {
+    return { tipo: "sequencia-de-naipe", real: cartas.every((c) => c.valor >= 10), cartasQuePontuam: [...cartas] };
+  }
+  if (grupos[0].qtd === 4) return { tipo: "quadra", real: false, cartasQuePontuam: dosGrupos(1) };
+  if (grupos[0].qtd === 3 && grupos[1]?.qtd === 2) return { tipo: "full-house", real: false, cartasQuePontuam: [...cartas] };
+  if (flush) return { tipo: "flush", real: false, cartasQuePontuam: [...cartas] };
+  if (sequencia) return { tipo: "sequencia", real: false, cartasQuePontuam: [...cartas] };
+  if (grupos[0].qtd === 3) return { tipo: "trinca", real: false, cartasQuePontuam: dosGrupos(1) };
+  if (grupos[0].qtd === 2 && grupos[1]?.qtd === 2) return { tipo: "dois-pares", real: false, cartasQuePontuam: dosGrupos(2) };
+  if (grupos[0].qtd === 2) return { tipo: "par", real: false, cartasQuePontuam: dosGrupos(1) };
+
+  const maisAlta = [...cartas].sort((a, b) => b.valor - a.valor)[0];
+  return { tipo: "carta-alta", real: false, cartasQuePontuam: [maisAlta] };
+}
+
+function ehSequencia(cartas) {
+  if (cartas.length !== 5) return false;
+  const valores = [...new Set(cartas.map((c) => c.valor))].sort((a, b) => a - b);
+  if (valores.length !== 5) return false;
+  if (valores[4] - valores[0] === 4) return true;
+  return valores.join(",") === "2,3,4,5,14"; // A-2-3-4-5 (ás baixo)
+}
