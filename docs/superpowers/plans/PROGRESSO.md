@@ -16,31 +16,22 @@ Branch: `feature/v1` | Workflow: superpowers:subagent-driven-development
 - [x] Task 7 — planetas + 25 coringas
 - [x] Task 8 — pipeline de pontuação (+polish: suprime efeito ×1 nulo; ?? no deck)
 - [x] Task 9 — estado + save localStorage
-- [x] Task 10 — loja (implementada e revisada; fixes do review AINDA PENDENTES, ver abaixo)
+- [x] Task 10 — loja (+fixes do review aplicados e commitados: guarda de índices, filter no load, import limpo)
+- [x] Task 11 — orquestração da rodada (engine/run.js) — aprovada sem fixes
+- [x] Task 12 — HTML + CSS (cópia canônica, aprovada sem fixes)
+- [x] Task 13 — UI título + seleção de blind (cópia canônica, aprovada sem fixes)
+- [x] Task 14 — UI rodada + animação (aprovada; import de run.js unificado em screens.js)
+- [x] Task 15 — UI loja/pacote/fim (aprovada sem fixes)
+- [x] Task 16 — README (idêntico ao plano) + smoke headless via engine em 3 seeds, sem crashes
 
-Testes atuais: `node tests/todos.js` → **58 teste(s), 0 falha(s)**
+Testes atuais: `node tests/todos.js` → **71 teste(s), 0 falha(s)**
 (os totais previstos no plano valem +1 a partir da Task 3, por causa do teste golden extra do RNG)
-
-## PRÓXIMO PASSO IMEDIATO — fixes do review da Task 10 (não aplicados)
-
-1. `js/engine/shop.js` — primeira linha de `reordenarCoringas`:
-   `if (de < 0 || de >= state.coringas.length) return;`
-2. `js/state.js` — em `carregar`, trocar o .map das coringas por:
-   `dados.coringas = dados.coringas.map(({ id, dados: d }) => ({ id, dados: d, def: CORINGAS[id] })).filter((c) => c.def !== undefined);`
-3. `tests/shop.test.js` — remover `MAX_CORINGAS, MAX_CONSUMIVEIS,` (não usados) do import.
-
-Depois: `node tests/todos.js` (esperado 58/0) e commit:
-`fix: guarda de índices ao reordenar, filtra coringas desconhecidos no load`
 
 ## Pendentes (na ordem)
 
-- [ ] Task 11 — orquestração da rodada (engine/run.js) — esperado 71 testes ao final (70 do plano +1)
-- [ ] Task 12 — HTML + CSS
-- [ ] Task 13 — UI título + seleção de blind
-- [ ] Task 14 — UI rodada + animação
-- [ ] Task 15 — UI loja/pacote/fim
-- [ ] Task 16 — README + verificação final + deploy GitHub Pages
 - [ ] Revisão final do conjunto (subagente opus) + superpowers:finishing-a-development-branch (merge em main)
+- [ ] Deploy GitHub Pages (ação do usuário: criar repo no GitHub, push, Settings→Pages → main/(root); depois trocar SEU-USUARIO no README)
+- [ ] Verificação visual no navegador (não há browser neste ambiente; roteiro no Step 2 da Task 16 do plano)
 
 ## Convenções (não esquecer nos prompts dos subagentes)
 
