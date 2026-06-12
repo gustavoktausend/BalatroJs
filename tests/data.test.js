@@ -1,0 +1,36 @@
+import { teste, ok, igual } from "./harness.js";
+import { PLANETAS, PRECO_PLANETA } from "../js/data/planets.js";
+import { CORINGAS, novoCoringa } from "../js/data/jokers.js";
+import { MAOS } from "../js/data/hands.js";
+
+teste("planets: 9 planetas, um por mão, preço $3", () => {
+  igual(Object.keys(PLANETAS).length, 9);
+  igual(PRECO_PLANETA, 3);
+  const maos = Object.values(PLANETAS).map((p) => p.mao);
+  igual(new Set(maos).size, 9, "cada planeta aponta para uma mão distinta");
+  for (const mao of maos) ok(mao in MAOS, `mão desconhecida: ${mao}`);
+  igual(PLANETAS.plutao.mao, "carta-alta");
+  igual(PLANETAS.netuno.mao, "sequencia-de-naipe");
+});
+
+teste("jokers: 25 coringas — 14 comuns, 8 incomuns, 3 raros", () => {
+  const lista = Object.values(CORINGAS);
+  igual(lista.length, 25);
+  igual(lista.filter((c) => c.raridade === "comum").length, 14);
+  igual(lista.filter((c) => c.raridade === "incomum").length, 8);
+  igual(lista.filter((c) => c.raridade === "raro").length, 3);
+  for (const c of lista) {
+    ok(c.id && c.nome && c.descricao, `coringa incompleto: ${c.id}`);
+    ok(c.preco >= 3 && c.preco <= 9, `preço fora da faixa: ${c.id}`);
+    ok(Object.keys(c.ganchos).length > 0, `coringa sem ganchos: ${c.id}`);
+  }
+});
+
+teste("jokers: novoCoringa clona o estado inicial", () => {
+  const a = novoCoringa("coringa-verde");
+  const b = novoCoringa("coringa-verde");
+  igual(a.dados, { mult: 0 });
+  a.dados.mult = 99;
+  igual(b.dados.mult, 0, "instâncias não compartilham dados");
+  ok(typeof a.def.ganchos.aoPontuarMao === "function");
+});
