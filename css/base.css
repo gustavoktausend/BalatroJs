@@ -1,0 +1,101 @@
+:root {
+  --feltro-claro: #356243;
+  --feltro-escuro: #1c3a27;
+  --painel: #23303d;
+  --painel-claro: #324354;
+  --painel-borda: #45596d;
+  --vermelho: #fe5f55;
+  --vermelho-escuro: #c43e36;
+  --azul: #29a8ff;
+  --azul-escuro: #1d7dc4;
+  --dourado: #f5b942;
+  --texto: #f4f1e8;
+  --texto-suave: #b8c4cc;
+  --fonte-pixel: "Press Start 2P", monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 35%, var(--feltro-claro), var(--feltro-escuro));
+  color: var(--texto);
+  font-family: "Rubik", system-ui, sans-serif;
+  user-select: none;
+}
+
+h1, h2, h3 { margin: 0.2em 0; }
+p { margin: 0.3em 0; }
+
+button { font: inherit; cursor: pointer; }
+
+.botao {
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  background: var(--painel-claro);
+  color: var(--texto);
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.06s;
+}
+.botao:hover:not(:disabled) { transform: translateY(-2px); }
+.botao:disabled { opacity: 0.45; cursor: not-allowed; }
+.botao-azul { background: var(--azul-escuro); }
+.botao-vermelho { background: var(--vermelho-escuro); }
+.botao-mini { padding: 0.3rem 0.7rem; font-size: 0.8rem; }
+
+.numero { font-family: var(--fonte-pixel); font-size: 0.95em; }
+.chips { color: var(--azul); }
+.mult { color: var(--vermelho); }
+.dinheiro { color: var(--dourado); }
+.descricao { color: var(--texto-suave); font-size: 0.9rem; }
+
+#tooltip {
+  position: fixed;
+  z-index: 50;
+  transform: translateX(-50%);
+  max-width: 260px;
+  padding: 0.5rem 0.7rem;
+  background: #10161c;
+  border: 2px solid var(--painel-borda);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.painel-baralho {
+  background: var(--painel);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 600px;
+  font-size: 1.05rem;
+}
+
+#aviso {
+  position: fixed;
+  left: 50%;
+  top: 12%;
+  transform: translateX(-50%);
+  z-index: 60;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  background: var(--vermelho-escuro);
+  font-weight: 600;
+  animation: sumir 1.8s forwards;
+}
+@keyframes sumir {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}
