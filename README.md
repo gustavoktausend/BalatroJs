@@ -4,7 +4,7 @@ Clone de estudo do núcleo jogável de [Balatro](https://www.playbalatro.com/), 
 em JavaScript, HTML e CSS puros — sem build, sem dependências. Interface em
 português (BR).
 
-**Jogue:** https://SEU-USUARIO.github.io/BalatroJs/
+**Jogue:** https://gustavoktausend.github.io/BalatroJs/
 
 ## O que tem na v1
 
