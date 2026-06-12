@@ -5,6 +5,7 @@ teste("rng: mesma seed produz a mesma sequência", () => {
   const a = { rngEstado: 123 };
   const b = { rngEstado: 123 };
   for (let i = 0; i < 10; i++) igual(proximoAleatorio(a), proximoAleatorio(b));
+  igual(a.rngEstado, b.rngEstado, "estados devem terminar iguais");
 });
 
 teste("rng: proximoAleatorio fica em [0, 1) e avança o estado", () => {
@@ -38,4 +39,12 @@ teste("rng: embaralhar preserva itens e não muta a original", () => {
   const resultado = embaralhar(state, lista);
   igual([...resultado].sort((x, y) => x - y), [1, 2, 3, 4, 5, 6, 7, 8]);
   igual(lista, [1, 2, 3, 4, 5, 6, 7, 8], "não deve mutar a original");
+});
+
+teste("rng: sequência fixa para seed conhecida (golden)", () => {
+  const state = { rngEstado: 0 };
+  const primeiros = [proximoAleatorio(state), proximoAleatorio(state), proximoAleatorio(state)];
+  // Valores do mulberry32 canônico para seed 0 — se este teste quebrar,
+  // o algoritmo mudou e todos os saves antigos deixam de ser determinísticos.
+  igual(primeiros.map((n) => n.toFixed(10)), ["0.2664292087", "0.0003297457", "0.2232720274"]);
 });
