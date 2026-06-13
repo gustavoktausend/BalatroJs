@@ -6,6 +6,7 @@ import { precoVenda } from "../engine/economy.js";
 import { venderCoringa, reordenarCoringas, MAX_CORINGAS, MAX_CONSUMIVEIS } from "../engine/shop.js";
 import { usarPlaneta } from "../engine/run.js";
 import { ligarTooltip } from "./tooltip.js";
+import { sufixoEstado } from "../data/jokers.js";
 
 // Criador de elementos: el("div", { classe: "x", onclick: fn, dataset: {...} }, ...filhos)
 export function el(tag, atributos = {}, ...filhos) {
@@ -97,12 +98,7 @@ export function elementoCoringa(coringa, indice = null) {
 }
 
 function descricaoCoringa(coringa) {
-  const dados = coringa.dados;
-  let extra = "";
-  if (dados.mult !== undefined) extra = ` (atual: +${dados.mult})`;
-  if (dados.x !== undefined) extra = ` (atual: ×${dados.x})`;
-  if (dados.valor !== undefined) extra = ` (atual: $${dados.valor})`;
-  return coringa.def.descricao + extra;
+  return coringa.def.descricao + sufixoEstado(coringa.dados);
 }
 
 export function elementoConsumivel(planetaId, indice = null) {

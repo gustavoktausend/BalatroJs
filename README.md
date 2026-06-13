@@ -14,6 +14,7 @@ português (BR).
 - Loja com re-rolagem, pacotes-surpresa e venda de Coringas
 - Save automático da run no navegador (localStorage)
 - RNG com seed: recarregar a página não re-rola a sorte
+- Sem dependências externas em runtime — fontes self-hosted (OFL) em `fonts/`
 
 ## Rodando localmente
 
