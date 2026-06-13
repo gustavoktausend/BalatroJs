@@ -241,39 +241,44 @@ CSS=$(curl -s --max-time 15 "https://fonts.googleapis.com/css2?family=Press+Star
 echo "$CSS"   # inspecionar: cada bloco @font-face tem um comentário de subset (/* latin */, /* latin-ext */) e um src woff2
 ```
 
-Da saída, identificar e baixar, **apenas dos subsets `latin` e `latin-ext`**:
-- Press Start 2P, weight 400 → 2 arquivos (latin, latin-ext)
-- Rubik weight 400 → 2 arquivos
-- Rubik weight 600 → 2 arquivos
-- Rubik weight 800 → 2 arquivos
+**Descoberta na execução:** o Google serve `Rubik` como **fonte variável** — os três
+pesos (400/600/800) de um mesmo subset apontam para o **mesmo** arquivo `.woff2`. Logo,
+precisamos de **apenas 4 arquivos** (não 8): Press Start 2P (latin + latin-ext) e Rubik
+variável (latin + latin-ext). No CSS, Rubik usa um `@font-face` por subset com
+`font-weight: 400 800` (faixa) apontando para o arquivo variável.
 
-Nomear de forma estável (não usar os hashes do Google). Exemplo de download de uma URL:
+URLs exatas (subsets latin + latin-ext), capturadas com User-Agent moderno:
+- Press Start 2P latin: `https://fonts.gstatic.com/s/pressstart2p/v16/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2`
+- Press Start 2P latin-ext: `https://fonts.gstatic.com/s/pressstart2p/v16/e3t4euO8T-267oIAQAu6jDQyK3nbivN04w.woff2`
+- Rubik latin (variável): `https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nBrXw.woff2`
+- Rubik latin-ext (variável): `https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nPrXyi0A.woff2`
+
+Nomear de forma estável (não usar os hashes do Google):
 
 ```bash
-curl -s -o fonts/press-start-2p-400-latin.woff2 "<URL latin do Press Start 2P 400>"
-curl -s -o fonts/press-start-2p-400-latin-ext.woff2 "<URL latin-ext>"
-curl -s -o fonts/rubik-400-latin.woff2 "<URL>"
-curl -s -o fonts/rubik-400-latin-ext.woff2 "<URL>"
-curl -s -o fonts/rubik-600-latin.woff2 "<URL>"
-curl -s -o fonts/rubik-600-latin-ext.woff2 "<URL>"
-curl -s -o fonts/rubik-800-latin.woff2 "<URL>"
-curl -s -o fonts/rubik-800-latin-ext.woff2 "<URL>"
+UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
+mkdir -p fonts
+curl -s -A "$UA" -o fonts/press-start-2p-latin.woff2     "https://fonts.gstatic.com/s/pressstart2p/v16/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2"
+curl -s -A "$UA" -o fonts/press-start-2p-latin-ext.woff2 "https://fonts.gstatic.com/s/pressstart2p/v16/e3t4euO8T-267oIAQAu6jDQyK3nbivN04w.woff2"
+curl -s -A "$UA" -o fonts/rubik-latin.woff2              "https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nBrXw.woff2"
+curl -s -A "$UA" -o fonts/rubik-latin-ext.woff2          "https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nPrXyi0A.woff2"
 ```
 
-Confirmar que todos têm tamanho > 0 e assinatura woff2:
+Confirmar que os 4 têm tamanho > 0 e assinatura woff2:
 
 ```bash
 ls -l fonts/*.woff2
 file fonts/*.woff2   # deve dizer "Web Open Font Format (Version 2)"
 ```
 
-Expected: 8 arquivos `.woff2`, todos não-vazios e reconhecidos como WOFF2.
+Expected: 4 arquivos `.woff2`, todos não-vazios e reconhecidos como WOFF2.
 
 - [ ] **Step 2: Criar `css/fonts.css`**
 
-Criar `css/fonts.css` com um `@font-face` por arquivo. Usar `font-display: swap` e o
-`unicode-range` apropriado para cada subset (copiar os ranges do CSS retornado pelo
-Google no Step 1 — latin e latin-ext têm ranges distintos). Modelo:
+Criar `css/fonts.css` com 4 blocos `@font-face` (um por arquivo). `Press Start 2P` tem
+peso fixo 400; `Rubik` é variável, então usa `font-weight: 400 800` (faixa) no mesmo
+arquivo por subset. `font-display: swap` em todos. Os `unicode-range` abaixo são os
+exatos que o Google serve hoje para latin e latin-ext:
 
 ```css
 /* Fontes self-hosted (OFL). Substituem o Google Fonts. Ver fonts/OFL.txt. */
@@ -284,8 +289,8 @@ Google no Step 1 — latin e latin-ext têm ranges distintos). Modelo:
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../fonts/press-start-2p-400-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url("../fonts/press-start-2p-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 /* Press Start 2P — latin-ext */
 @font-face {
@@ -293,70 +298,29 @@ Google no Step 1 — latin e latin-ext têm ranges distintos). Modelo:
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../fonts/press-start-2p-400-latin-ext.woff2") format("woff2");
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url("../fonts/press-start-2p-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
-/* Rubik 400 — latin */
+/* Rubik (variável, pesos 400–800) — latin */
 @font-face {
   font-family: "Rubik";
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 800;
   font-display: swap;
-  src: url("../fonts/rubik-400-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url("../fonts/rubik-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-/* Rubik 400 — latin-ext */
+/* Rubik (variável, pesos 400–800) — latin-ext */
 @font-face {
   font-family: "Rubik";
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 800;
   font-display: swap;
-  src: url("../fonts/rubik-400-latin-ext.woff2") format("woff2");
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-
-/* Rubik 600 — latin */
-@font-face {
-  font-family: "Rubik";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("../fonts/rubik-600-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* Rubik 600 — latin-ext */
-@font-face {
-  font-family: "Rubik";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("../fonts/rubik-600-latin-ext.woff2") format("woff2");
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-
-/* Rubik 800 — latin */
-@font-face {
-  font-family: "Rubik";
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url("../fonts/rubik-800-latin.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* Rubik 800 — latin-ext */
-@font-face {
-  font-family: "Rubik";
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url("../fonts/rubik-800-latin-ext.woff2") format("woff2");
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url("../fonts/rubik-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 ```
-
-> Os valores de `unicode-range` acima são os que o Google Fonts usa hoje para latin e
-> latin-ext. Se a saída do Step 1 trouxer ranges diferentes, usar os da saída real.
 
 - [ ] **Step 3: Atualizar `index.html`**
 

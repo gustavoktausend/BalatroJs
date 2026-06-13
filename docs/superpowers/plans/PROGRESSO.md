@@ -35,11 +35,24 @@ Testes atuais: `node tests/todos.js` → **71 teste(s), 0 falha(s)**
 - [ ] Deploy GitHub Pages: criar repo no GitHub, push da main, Settings→Pages → main/(root); depois trocar SEU-USUARIO no README
 - [ ] Verificação visual no navegador (não há browser neste ambiente; roteiro no Step 2 da Task 16 do plano)
 
-## Minors da revisão final (para milestone futura, não bloqueiam)
+## Minors da revisão final — RESOLVIDOS (polimento, 2026-06-13)
 
-1. Google Fonts é a única referência externa do app (degrada para fontes do sistema offline) — documentar ou self-hostear.
-2. `vencerBlind` devolve `recompensa` mas a UI não mostra um aviso "+$N" ao vencer a blind.
-3. `descricaoCoringa` usa `if` encadeado sem `else`: coringa hipotético com dois campos de `dados` mostraria só o último sufixo.
+Frente de polimento executada em `feature/polimento-v1` (plano
+`docs/superpowers/plans/2026-06-12-polimento-v1.md`, spec
+`docs/superpowers/specs/2026-06-12-polimento-v1-design.md`). Workflow
+subagent-driven: implementador → revisor spec → revisor qualidade.
+
+- [x] Minor 1 — fontes self-hostadas (Press Start 2P + Rubik variável, OFL) em `fonts/`,
+  via `css/fonts.css`; removidos os links do Google Fonts. App roda offline sem
+  dependência externa em runtime. (commit `5bd06e1`)
+- [x] Minor 2 — `aoJogar` mostra toast "Blind vencida! +$N" após a animação, antes da
+  loja. (commit `d977361`) — verificação **visual** no navegador ainda pendente (sem
+  browser neste ambiente).
+- [x] Minor 3 — `descricaoCoringa` corrigido: lógica extraída para `sufixoEstado(dados)`
+  (função pura em `jokers.js`, testada), acumula todos os campos em vez de sobrescrever.
+  (commit `3217d00`)
+
+Testes após o polimento: `node tests/todos.js` → **72 teste(s), 0 falha(s)**.
 
 ## Convenções (não esquecer nos prompts dos subagentes)
 
