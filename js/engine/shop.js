@@ -61,6 +61,16 @@ function adicionarCoringa(state, id) {
   state.coringas.push(novoCoringa(id));
 }
 
+// Cria um Coringa aleatório de uma raridade no slot, se houver espaço e opção.
+// Reusado por Tarôs/Espectrais. Devolve {} ou { erro }.
+export function criarCoringaDe(state, raridade) {
+  if (state.coringas.length >= MAX_CORINGAS) return { erro: "sem-espaco" };
+  const opcoes = coringasDisponiveis(state, raridade);
+  if (!opcoes.length) return { erro: "vazio" };
+  adicionarCoringa(state, escolher(state, opcoes).id);
+  return {};
+}
+
 export function comprarItem(state, indice) {
   const item = state.loja.itens[indice];
   if (!item) return { erro: "vazio" };
