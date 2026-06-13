@@ -247,6 +247,11 @@ precisamos de **apenas 4 arquivos** (não 8): Press Start 2P (latin + latin-ext)
 variável (latin + latin-ext). No CSS, Rubik usa um `@font-face` por subset com
 `font-weight: 400 800` (faixa) apontando para o arquivo variável.
 
+Benefício colateral: o CSS usa Rubik nos pesos 600 e 700 (`cards.css`, `base.css`,
+`screens.css`); a fonte variável cobre 400–800 continuamente, então 700 vem do arquivo
+real — antes, o pedido ao Google (`wght@400;600;800`) não incluía 700 e o navegador o
+sintetizava.
+
 URLs exatas (subsets latin + latin-ext), capturadas com User-Agent moderno:
 - Press Start 2P latin: `https://fonts.gstatic.com/s/pressstart2p/v16/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2`
 - Press Start 2P latin-ext: `https://fonts.gstatic.com/s/pressstart2p/v16/e3t4euO8T-267oIAQAu6jDQyK3nbivN04w.woff2`
