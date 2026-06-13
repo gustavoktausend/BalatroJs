@@ -3,6 +3,7 @@ import { NAIPES_VERMELHOS, SIMBOLO_NAIPE, rotuloDaCarta } from "../engine/deck.j
 import { MAOS } from "../data/hands.js";
 import { PLANETAS } from "../data/planets.js";
 import { precoVenda } from "../engine/economy.js";
+import { codificarSeed } from "../engine/seed.js";
 import { venderCoringa, reordenarCoringas, MAX_CORINGAS, MAX_CONSUMIVEIS } from "../engine/shop.js";
 import { usarPlaneta } from "../engine/run.js";
 import { ligarTooltip } from "./tooltip.js";
@@ -37,6 +38,7 @@ export function cabecalhoRun(state) {
     el("span", { classe: "numero dinheiro" }, `$${state.dinheiro}`),
     el("span", {}, `Ante ${state.ante}/8`),
     el("span", { classe: "descricao" }, `Rodadas vencidas: ${state.estatisticas.rodadas}`),
+    el("span", { classe: "descricao" }, `Seed: ${codificarSeed(state.semente)}`),
   );
 }
 
@@ -51,6 +53,7 @@ const MENSAGENS = {
   "chefe-obrigatorio": "O Chefe não pode ser pulado.",
   "vazio": "Nada aqui.",
   "slot-vazio": "Slot vazio.",
+  "seed-invalida": "Código de seed inválido.",
 };
 
 export function avisar(codigo) {

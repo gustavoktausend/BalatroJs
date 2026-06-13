@@ -1,5 +1,6 @@
 import { app, atualizar } from "../app.js";
 import { criarRun, carregar } from "../state.js";
+import { decodificarSeed } from "../engine/seed.js";
 import { el, cabecalhoRun, elementoCarta, fileiraCoringas, fileiraConsumiveis, avisar, elementoCoringa, elementoConsumivel } from "./render.js";
 import { novoCoringa } from "../data/jokers.js";
 import { comprarItem, comprarPacote, rerolar, escolherDoPacote, pularPacote, PRECO_PACOTE } from "../engine/shop.js";
@@ -27,10 +28,30 @@ function secaoDe(fase) {
 // ── Título ──────────────────────────────────────────────
 function renderTitulo() {
   const secao = secaoDe("titulo");
+  const campoSeed = el("input", {
+    id: "campo-seed",
+    classe: "campo-seed",
+    type: "text",
+    placeholder: "Seed (opcional)",
+    maxlength: "8", // folga p/ espaços colados; decodificarSeed faz trim e exige 6 chars
+  });
+  // Nome distinto de `jogar` (importado de run.js) para não sombrear o import.
+  function iniciarJogo() {
+    const valor = campoSeed.value.trim();
+    if (valor === "") {
+      app.state = criarRun();
+    } else {
+      const semente = decodificarSeed(valor);
+      if (semente === null) { avisar("seed-invalida"); return; }
+      app.state = criarRun(semente);
+    }
+    atualizar();
+  }
   secao.replaceChildren(
     el("h1", { classe: "logo" }, "BalatroJS"),
     el("p", { classe: "subtitulo" }, "um clone de estudo em JavaScript puro"),
-    el("button", { classe: "botao botao-azul", onclick: () => { app.state = criarRun(); atualizar(); } }, "Jogar"),
+    campoSeed,
+    el("button", { classe: "botao botao-azul", onclick: iniciarJogo }, "Jogar"),
   );
   const save = carregar();
   if (save) {

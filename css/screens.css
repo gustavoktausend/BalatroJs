@@ -127,3 +127,20 @@
   margin-top: 0.9rem;
   flex-wrap: wrap;
 }
+
+.campo-seed {
+  display: block;
+  margin: 0.6rem auto;
+  padding: 0.5rem 0.8rem;
+  width: 12rem;
+  text-align: center;
+  text-transform: uppercase;
+  font: inherit;
+  letter-spacing: 0.15em;
+  color: var(--texto);
+  background: var(--painel);
+  border: 2px solid var(--painel-borda);
+  border-radius: 8px;
+}
+.campo-seed::placeholder { color: var(--texto-suave); letter-spacing: normal; }
+.campo-seed:focus { outline: none; border-color: var(--dourado); }
