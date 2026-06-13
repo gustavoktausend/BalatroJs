@@ -10,6 +10,7 @@ import "./state.test.js";
 import "./shop.test.js";
 import "./run.test.js";
 import "./fundo.test.js";
+import "./seed.test.js";
 
 // Os arquivos *.test.js são adicionados aqui conforme as tarefas avançam.
 
