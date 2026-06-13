@@ -1,6 +1,6 @@
 import { teste, ok, igual } from "./harness.js";
 import { PLANETAS, PRECO_PLANETA } from "../js/data/planets.js";
-import { CORINGAS, novoCoringa } from "../js/data/jokers.js";
+import { CORINGAS, novoCoringa, sufixoEstado } from "../js/data/jokers.js";
 import { MAOS } from "../js/data/hands.js";
 
 teste("planets: 9 planetas, um por mão, preço $3", () => {
@@ -33,4 +33,13 @@ teste("jokers: novoCoringa clona o estado inicial", () => {
   a.dados.mult = 99;
   igual(b.dados.mult, 0, "instâncias não compartilham dados");
   ok(typeof a.def.ganchos.aoPontuarMao === "function");
+});
+
+teste("jokers: sufixoEstado mostra cada campo de dados presente", () => {
+  igual(sufixoEstado({}), "", "dados vazio não gera sufixo");
+  igual(sufixoEstado({ mult: 5 }), " (atual: +5)", "campo mult");
+  igual(sufixoEstado({ x: 1.5 }), " (atual: ×1.5)", "campo x");
+  igual(sufixoEstado({ valor: 3 }), " (atual: $3)", "campo valor");
+  // O caso que a versão antiga quebrava: dois campos ao mesmo tempo.
+  igual(sufixoEstado({ mult: 5, x: 1.5 }), " (atual: +5, ×1.5)");
 });

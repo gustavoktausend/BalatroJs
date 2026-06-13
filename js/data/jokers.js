@@ -140,3 +140,13 @@ export function novoCoringa(id) {
   const def = CORINGAS[id];
   return { id, dados: structuredClone(def.estadoInicial || {}), def };
 }
+
+// Sufixo "(atual: …)" exibido no tooltip de um Coringa com estado interno.
+// Acumula todos os campos conhecidos presentes em "dados", na ordem mult → x → valor.
+export function sufixoEstado(dados) {
+  const partes = [];
+  if (dados.mult !== undefined) partes.push(`+${dados.mult}`);
+  if (dados.x !== undefined) partes.push(`×${dados.x}`);
+  if (dados.valor !== undefined) partes.push(`$${dados.valor}`);
+  return partes.length ? ` (atual: ${partes.join(", ")})` : "";
+}
