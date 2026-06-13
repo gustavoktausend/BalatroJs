@@ -163,6 +163,7 @@ async function aoJogar(state) {
   document.getElementById("btn-jogar").disabled = true;
   document.getElementById("btn-descartar").disabled = true;
   await animarJogada(cartas, resultado.eventos, document.getElementById("area-jogada"));
+  if (resultado.vitoriaBlind) avisar(`Blind vencida! +$${resultado.recompensa}`);
   atualizar();
 }
 
