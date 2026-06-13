@@ -5,7 +5,7 @@ import { PLANETAS } from "../data/planets.js";
 import { precoVenda } from "../engine/economy.js";
 import { codificarSeed } from "../engine/seed.js";
 import { venderCoringa, reordenarCoringas, MAX_CORINGAS, MAX_CONSUMIVEIS } from "../engine/shop.js";
-import { usarPlaneta } from "../engine/run.js";
+import { usarConsumivel } from "../engine/run.js";
 import { ligarTooltip } from "./tooltip.js";
 import { sufixoEstado } from "../data/jokers.js";
 
@@ -112,7 +112,7 @@ export function elementoConsumivel(planetaId, indice = null) {
     `<strong>${planeta.nome}</strong><br>Sobe o nível de ${MAOS[planeta.mao].nome} (nível atual: ${nivel})`);
   if (indice !== null) {
     elemento.addEventListener("click", () => {
-      usarPlaneta(app.state, indice);
+      usarConsumivel(app.state, indice);
       atualizar();
     });
   }
