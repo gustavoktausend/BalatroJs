@@ -240,7 +240,7 @@ function renderLoja(state) {
 function cartaoItem(state, item, indice) {
   const corpo = item.tipo === "coringa"
     ? elementoCoringa(novoCoringa(item.id))
-    : elementoConsumivel(item.id);
+    : elementoConsumivel({ tipo: item.tipo, id: item.id });
   return el("div", { classe: "cartao-item" },
     corpo,
     el("button", {
@@ -261,15 +261,23 @@ function cartaoPacote(state) {
   );
 }
 
+const TITULO_PACOTE = {
+  planeta: "Pacote Celestial",
+  coringa: "Pacote de Coringas",
+  taro: "Pacote Arcano",
+  espectral: "Pacote Espectral",
+};
+
 function renderPacote(state) {
   const secao = secaoDe("pacote");
+  const tipo = state.pacote.tipo;
   secao.replaceChildren(
-    el("h2", { classe: "logo" }, state.pacote.tipo === "planeta" ? "Pacote Celestial" : "Pacote de Coringas"),
+    el("h2", { classe: "logo" }, TITULO_PACOTE[tipo]),
     el("p", { classe: "subtitulo" }, "Escolha 1"),
     el("div", { classe: "itens-loja" },
       ...state.pacote.opcoes.map((id, i) =>
         el("div", { classe: "cartao-item" },
-          state.pacote.tipo === "planeta" ? elementoConsumivel(id) : elementoCoringa(novoCoringa(id)),
+          tipo === "coringa" ? elementoCoringa(novoCoringa(id)) : elementoConsumivel({ tipo, id }),
           el("button", {
             classe: "botao botao-azul",
             onclick: () => { const r = escolherDoPacote(state, i); if (r.erro) avisar(r.erro); else atualizar(); },
