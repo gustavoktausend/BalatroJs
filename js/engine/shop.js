@@ -1,6 +1,8 @@
 import { proximoAleatorio, escolher } from "./rng.js";
 import { CORINGAS, novoCoringa } from "../data/jokers.js";
 import { PLANETAS, PRECO_PLANETA } from "../data/planets.js";
+import { TAROS } from "../data/taros.js";
+import { ESPECTRAIS } from "../data/espectrais.js";
 import { precoVenda } from "./economy.js";
 
 export const PRECO_PACOTE = 4;
@@ -31,9 +33,22 @@ function sortearPlaneta(state) {
   return { tipo: "planeta", id: escolher(state, Object.keys(PLANETAS)), preco: PRECO_PLANETA };
 }
 
+function sortearTaro(state) {
+  const def = escolher(state, Object.values(TAROS));
+  return { tipo: "taro", id: def.id, preco: def.preco };
+}
+
+function sortearEspectral(state) {
+  const def = escolher(state, Object.values(ESPECTRAIS));
+  return { tipo: "espectral", id: def.id, preco: def.preco };
+}
+
 function sortearItem(state) {
-  if (proximoAleatorio(state) < 0.3) return sortearPlaneta(state);
-  return sortearCoringa(state) || sortearPlaneta(state);
+  const r = proximoAleatorio(state);
+  if (r < 0.45) return sortearCoringa(state) || sortearPlaneta(state);
+  if (r < 0.70) return sortearPlaneta(state);
+  if (r < 0.92) return sortearTaro(state);
+  return sortearEspectral(state);
 }
 
 export function gerarLoja(state) {
@@ -76,13 +91,24 @@ export function comprarItem(state, indice) {
   if (!item) return { erro: "vazio" };
   if (state.dinheiro < item.preco) return { erro: "sem-dinheiro" };
   if (item.tipo === "coringa" && state.coringas.length >= MAX_CORINGAS) return { erro: "sem-espaco" };
-  if (item.tipo === "planeta" && state.consumiveis.length >= MAX_CONSUMIVEIS) return { erro: "sem-espaco" };
+  if (item.tipo !== "coringa" && state.consumiveis.length >= MAX_CONSUMIVEIS) return { erro: "sem-espaco" };
 
   state.dinheiro -= item.preco;
   state.loja.itens[indice] = null;
   if (item.tipo === "coringa") adicionarCoringa(state, item.id);
-  else state.consumiveis.push(item.id);
+  else state.consumiveis.push({ tipo: item.tipo, id: item.id });
   return {};
+}
+
+// Sorteia N ids únicos de uma lista (para opções de pacote). Para se a lista for menor.
+function sortearOpcoesUnicas(state, ids, n) {
+  const opcoes = [];
+  let tentativas = 0;
+  while (opcoes.length < Math.min(n, ids.length) && tentativas++ < 100) {
+    const id = escolher(state, ids);
+    if (!opcoes.includes(id)) opcoes.push(id);
+  }
+  return opcoes;
 }
 
 export function comprarPacote(state) {
@@ -91,15 +117,10 @@ export function comprarPacote(state) {
   state.dinheiro -= PRECO_PACOTE;
   state.loja.pacoteAberto = true;
 
-  if (proximoAleatorio(state) < 0.5) {
-    const opcoes = [];
-    const ids = Object.keys(PLANETAS);
-    while (opcoes.length < 3) {
-      const id = escolher(state, ids);
-      if (!opcoes.includes(id)) opcoes.push(id);
-    }
-    state.pacote = { tipo: "planeta", opcoes };
-  } else {
+  const r = proximoAleatorio(state);
+  if (r < 0.30) {
+    state.pacote = { tipo: "planeta", opcoes: sortearOpcoesUnicas(state, Object.keys(PLANETAS), 3) };
+  } else if (r < 0.60) {
     const opcoes = [];
     let tentativas = 0;
     while (opcoes.length < 2 && tentativas++ < 50) {
@@ -108,6 +129,10 @@ export function comprarPacote(state) {
       if (!opcoes.includes(sorteado.id)) opcoes.push(sorteado.id);
     }
     state.pacote = { tipo: "coringa", opcoes };
+  } else if (r < 0.90) {
+    state.pacote = { tipo: "taro", opcoes: sortearOpcoesUnicas(state, Object.keys(TAROS), 3) };
+  } else {
+    state.pacote = { tipo: "espectral", opcoes: sortearOpcoesUnicas(state, Object.keys(ESPECTRAIS), 2) };
   }
   state.fase = "pacote";
   return {};
@@ -120,7 +145,7 @@ export function escolherDoPacote(state, indice) {
     adicionarCoringa(state, id);
   } else {
     if (state.consumiveis.length >= MAX_CONSUMIVEIS) return { erro: "sem-espaco" };
-    state.consumiveis.push(id);
+    state.consumiveis.push({ tipo: state.pacote.tipo, id });
   }
   state.pacote = null;
   state.fase = "loja";
