@@ -5,6 +5,8 @@ import { pontuarJogada, chefeAtivo } from "./scoring.js";
 import { alvoDaBlind, chefeDoAnte } from "./blinds.js";
 import { recompensaBlind } from "./economy.js";
 import { gerarLoja } from "./shop.js";
+import { BARALHOS } from "../data/baralhos.js";
+import { STAKES } from "../data/stakes.js";
 import { PLANETAS } from "../data/planets.js";
 import { TAROS } from "../data/taros.js";
 import { ESPECTRAIS } from "../data/espectrais.js";
@@ -16,13 +18,15 @@ export const TAMANHO_MAO = 8;
 
 export function iniciarBlind(state, tipo) {
   const chefeId = tipo === "chefe" ? chefeDoAnte(state) : null;
-  state.blindAtual = { tipo, chefeId, alvo: alvoDaBlind(state.ante, tipo, chefeId) };
+  const baralho = BARALHOS[state.baralho] || BARALHOS.padrao;
+  const multStake = (STAKES[state.stake] || STAKES.branco).multAlvo;
+  state.blindAtual = { tipo, chefeId, alvo: alvoDaBlind(state.ante, tipo, chefeId, multStake) };
   state.rodada = {
     baralho: embaralhar(state, criarBaralho()),
     mao: [],
     pontuacao: 0,
-    maosRestantes: MAOS_POR_BLIND + (state.vouchers.includes("maos-mais") ? 1 : 0),
-    descartesRestantes: DESCARTES_POR_BLIND,
+    maosRestantes: MAOS_POR_BLIND + (state.vouchers.includes("maos-mais") ? 1 : 0) + baralho.maosBonus,
+    descartesRestantes: DESCARTES_POR_BLIND + baralho.descartesBonus,
     descartesUsados: 0,
     tiposJogados: [],
     ordenacao: "valor",

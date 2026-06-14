@@ -157,3 +157,6 @@
 }
 .linha-mao:last-child { border-bottom: none; }
 .linha-mao .nome-mao { font-weight: 600; }
+
+.seletor-run { cursor: pointer; }
+.rotulo-seletor { display: block; margin: 0.6rem 0 0.2rem; font-weight: 600; }
