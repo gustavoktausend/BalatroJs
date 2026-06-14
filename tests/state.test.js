@@ -10,6 +10,7 @@ teste("state: criarRun monta o estado inicial do spec", () => {
   igual(state.fase, "selecao-blind");
   igual(state.coringas, []);
   igual(state.consumiveis, []);
+  igual(state.vouchers, []);
   igual(state.chefesPorAnte.length, 8);
   igual(new Set(state.chefesPorAnte).size, 8);
   igual(Object.values(state.niveisMaos), [1, 1, 1, 1, 1, 1, 1, 1, 1]);

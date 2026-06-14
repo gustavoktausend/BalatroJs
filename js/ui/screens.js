@@ -3,7 +3,9 @@ import { criarRun, carregar } from "../state.js";
 import { decodificarSeed } from "../engine/seed.js";
 import { el, cabecalhoRun, elementoCarta, fileiraCoringas, fileiraConsumiveis, avisar, elementoCoringa, elementoConsumivel } from "./render.js";
 import { novoCoringa } from "../data/jokers.js";
-import { comprarItem, comprarPacote, rerolar, escolherDoPacote, pularPacote, PRECO_PACOTE } from "../engine/shop.js";
+import { comprarItem, comprarPacote, rerolar, escolherDoPacote, pularPacote, comprarVoucher, precoEfetivo, PRECO_PACOTE } from "../engine/shop.js";
+import { VOUCHERS, PRECO_VOUCHER } from "../data/vouchers.js";
+import { ligarTooltip } from "./tooltip.js";
 import { CHEFES } from "../data/bosses.js";
 import { alvoDaBlind, chefeDoAnte } from "../engine/blinds.js";
 import { PREMIOS } from "../engine/economy.js";
@@ -237,10 +239,12 @@ function renderLoja(state) {
   secao.replaceChildren(
     el("h2", { classe: "logo" }, "Loja"),
     cabecalhoRun(state),
+    vouchersPossuidos(state),
     el("div", { classe: "topo" }, fileiraCoringas(state), fileiraConsumiveis(state)),
     el("div", { classe: "itens-loja" },
       ...state.loja.itens.map((item, i) => (item ? cartaoItem(state, item, i) : el("div", { classe: "slot-vazio" }))),
       cartaoPacote(state),
+      cartaoVoucher(state),
     ),
     el("div", { classe: "controles" },
       el("button", {
@@ -264,7 +268,7 @@ function cartaoItem(state, item, indice) {
     el("button", {
       classe: "botao botao-azul",
       onclick: () => { const r = comprarItem(state, indice); if (r.erro) avisar(r.erro); else atualizar(); },
-    }, `Comprar $${item.preco}`),
+    }, `Comprar $${precoEfetivo(state, item)}`),
   );
 }
 
@@ -277,6 +281,27 @@ function cartaoPacote(state) {
       onclick: () => { const r = comprarPacote(state); if (r.erro) avisar(r.erro); else atualizar(); },
     }, state.loja.pacoteAberto ? "Aberto" : `Abrir $${PRECO_PACOTE}`),
   );
+}
+
+function cartaoVoucher(state) {
+  const v = state.loja.voucher;
+  if (!v) return el("div", { classe: "slot-vazio" });
+  const def = VOUCHERS[v.id];
+  const cartao = el("div", { classe: "voucher" }, el("span", { classe: "nome" }, def.nome));
+  ligarTooltip(cartao, `<strong>${def.nome}</strong><br>${def.descricao}`);
+  return el("div", { classe: "cartao-item" },
+    cartao,
+    el("button", {
+      classe: "botao botao-azul",
+      onclick: () => { const r = comprarVoucher(state); if (r.erro) avisar(r.erro); else atualizar(); },
+    }, `Comprar $${PRECO_VOUCHER}`),
+  );
+}
+
+function vouchersPossuidos(state) {
+  if (!state.vouchers.length) return el("p", { classe: "descricao" }, "Vouchers: nenhum");
+  const nomes = state.vouchers.map((id) => VOUCHERS[id].nome).join(", ");
+  return el("p", { classe: "descricao" }, `Vouchers: ${nomes}`);
 }
 
 const TITULO_PACOTE = {

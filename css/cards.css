@@ -109,3 +109,19 @@
 .coringa { flex-direction: column; justify-content: space-between; align-items: center; }
 .coringa .nome { width: 100%; }
 .icone-coringa { width: 70%; height: auto; margin-top: 4px; pointer-events: none; }
+.voucher {
+  position: relative;
+  width: 96px;
+  height: 124px;
+  flex: none;
+  border-radius: 10px;
+  padding: 8px 6px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: linear-gradient(160deg, #b58a2e, #6b4e12);
+  border: 2px solid var(--dourado);
+}

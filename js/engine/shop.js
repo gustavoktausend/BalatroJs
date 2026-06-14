@@ -4,6 +4,7 @@ import { PLANETAS, PRECO_PLANETA } from "../data/planets.js";
 import { TAROS } from "../data/taros.js";
 import { ESPECTRAIS } from "../data/espectrais.js";
 import { precoVenda } from "./economy.js";
+import { VOUCHERS, PRECO_VOUCHER } from "../data/vouchers.js";
 
 export const PRECO_PACOTE = 4;
 export const MAX_CORINGAS = 5;
@@ -51,11 +52,25 @@ function sortearItem(state) {
   return sortearEspectral(state);
 }
 
+// Preço de um item da loja já com o desconto de Liquidação (mín. $1). Fonte única
+// para exibição e cobrança.
+export function precoEfetivo(state, item) {
+  const desconto = state.vouchers.includes("liquidacao") ? 1 : 0;
+  return Math.max(1, item.preco - desconto);
+}
+
+// Sorteia 1 voucher ainda não possuído, ou null se o jogador já tem todos.
+function sortearVoucher(state) {
+  const opcoes = Object.keys(VOUCHERS).filter((id) => !state.vouchers.includes(id));
+  return opcoes.length ? { id: escolher(state, opcoes) } : null;
+}
+
 export function gerarLoja(state) {
   state.loja = {
     itens: [sortearItem(state), sortearItem(state)],
-    precoRerolar: 5,
+    precoRerolar: state.vouchers.includes("bussola") ? 3 : 5,
     pacoteAberto: false,
+    voucher: sortearVoucher(state),
   };
 }
 
@@ -89,14 +104,24 @@ export function criarCoringaDe(state, raridade) {
 export function comprarItem(state, indice) {
   const item = state.loja.itens[indice];
   if (!item) return { erro: "vazio" };
-  if (state.dinheiro < item.preco) return { erro: "sem-dinheiro" };
+  const preco = precoEfetivo(state, item);
+  if (state.dinheiro < preco) return { erro: "sem-dinheiro" };
   if (item.tipo === "coringa" && state.coringas.length >= MAX_CORINGAS) return { erro: "sem-espaco" };
   if (item.tipo !== "coringa" && state.consumiveis.length >= MAX_CONSUMIVEIS) return { erro: "sem-espaco" };
 
-  state.dinheiro -= item.preco;
+  state.dinheiro -= preco;
   state.loja.itens[indice] = null;
   if (item.tipo === "coringa") adicionarCoringa(state, item.id);
   else state.consumiveis.push({ tipo: item.tipo, id: item.id });
+  return {};
+}
+
+export function comprarVoucher(state) {
+  if (!state.loja.voucher) return { erro: "vazio" };
+  if (state.dinheiro < PRECO_VOUCHER) return { erro: "sem-dinheiro" };
+  state.dinheiro -= PRECO_VOUCHER;
+  state.vouchers.push(state.loja.voucher.id);
+  state.loja.voucher = null;
   return {};
 }
 
