@@ -9,6 +9,7 @@ import "./scoring.test.js";
 import "./state.test.js";
 import "./shop.test.js";
 import "./run.test.js";
+import "./vouchers.test.js";
 import "./consumiveis.test.js";
 import "./fundo.test.js";
 import "./seed.test.js";
