@@ -21,7 +21,7 @@ export function iniciarBlind(state, tipo) {
     baralho: embaralhar(state, criarBaralho()),
     mao: [],
     pontuacao: 0,
-    maosRestantes: MAOS_POR_BLIND,
+    maosRestantes: MAOS_POR_BLIND + (state.vouchers.includes("maos-mais") ? 1 : 0),
     descartesRestantes: DESCARTES_POR_BLIND,
     descartesUsados: 0,
     tiposJogados: [],
@@ -115,7 +115,8 @@ function vencerBlind(state, eventos) {
     eventos.push({ tipo: "coringa-destruido", id: coringa.id, nome: coringa.def.nome });
   }
 
-  const recompensa = recompensaBlind(tipo, state.rodada.maosRestantes, state.dinheiro) + dinheiroExtra;
+  const tetoJuros = state.vouchers.includes("juros-mais") ? 10 : 5;
+  const recompensa = recompensaBlind(tipo, state.rodada.maosRestantes, state.dinheiro, tetoJuros) + dinheiroExtra;
   state.dinheiro += recompensa;
   state.estatisticas.rodadas += 1;
 
