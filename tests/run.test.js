@@ -2,7 +2,7 @@ import { teste, ok, igual } from "./harness.js";
 import { criarRun, apagarSave } from "../js/state.js";
 import { novoCoringa } from "../js/data/jokers.js";
 import {
-  iniciarBlind, pularBlind, jogar, descartar, ordenarMao, usarPlaneta,
+  iniciarBlind, pularBlind, jogar, descartar, ordenarMao, usarConsumivel,
   TAMANHO_MAO, MAOS_POR_BLIND, DESCARTES_POR_BLIND,
 } from "../js/engine/run.js";
 
@@ -162,15 +162,29 @@ teste("run: ordenarMao por valor e por naipe", () => {
   igual([...naipes].sort(), naipes);
 });
 
-teste("run: usarPlaneta sobe o nível e avisa a constelação", () => {
+teste("run: usarConsumivel (planeta) sobe o nível e avisa a constelação", () => {
   const state = emRodada();
   state.coringas = [novoCoringa("constelacao")];
-  state.consumiveis = ["mercurio"];
-  igual(usarPlaneta(state, 0), {});
+  state.consumiveis = [{ tipo: "planeta", id: "mercurio" }];
+  igual(usarConsumivel(state, 0), {});
   igual(state.niveisMaos["par"], 2);
   igual(state.consumiveis, []);
   igual(state.coringas[0].dados.x, 1.1);
-  igual(usarPlaneta(state, 0).erro, "slot-vazio");
+  igual(usarConsumivel(state, 0).erro, "slot-vazio");
+});
+
+teste("run: usarConsumivel (taro/espectral) — sucesso gasta, erro reinsere", () => {
+  const state = emRodada();
+  state.consumiveis = [{ tipo: "taro", id: "o-mundo" }];
+  const antes = state.dinheiro;
+  igual(usarConsumivel(state, 0), {});
+  igual(state.dinheiro, antes + 20);
+  igual(state.consumiveis, [], "sucesso remove o slot");
+
+  state.coringas = ["coringa", "ganancioso", "voraz", "colerico", "guloso"].map(novoCoringa);
+  state.consumiveis = [{ tipo: "espectral", id: "seance" }];
+  igual(usarConsumivel(state, 0).erro, "sem-espaco");
+  igual(state.consumiveis, [{ tipo: "espectral", id: "seance" }], "erro mantém o slot");
 });
 
 // limpeza: testes acima gravam save indireto? (jogar/iniciar não salvam — só a UI salva)

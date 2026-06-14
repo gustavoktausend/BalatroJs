@@ -6,6 +6,8 @@ import { alvoDaBlind, chefeDoAnte } from "./blinds.js";
 import { recompensaBlind } from "./economy.js";
 import { gerarLoja } from "./shop.js";
 import { PLANETAS } from "../data/planets.js";
+import { TAROS } from "../data/taros.js";
+import { ESPECTRAIS } from "../data/espectrais.js";
 import { apagarSave } from "../state.js";
 
 export const MAOS_POR_BLIND = 4;
@@ -145,13 +147,27 @@ export function descartar(state, indices) {
   return {};
 }
 
-export function usarPlaneta(state, indice) {
-  const planetaId = state.consumiveis[indice];
-  if (!planetaId) return { erro: "slot-vazio" };
+export function usarConsumivel(state, indice) {
+  const item = state.consumiveis[indice];
+  if (!item) return { erro: "slot-vazio" };
+
+  if (item.tipo === "planeta") {
+    state.consumiveis.splice(indice, 1);
+    state.niveisMaos[PLANETAS[item.id].mao] += 1;
+    for (const coringa of state.coringas) {
+      coringa.def.ganchos.aoUsarPlaneta?.({ state, coringa });
+    }
+    return {};
+  }
+
+  // Tarô/Espectral: remove o slot antes de aplicar (libera vaga p/ A Lua);
+  // se aplicar falhar, reinsere o consumível na posição original.
+  const def = item.tipo === "taro" ? TAROS[item.id] : ESPECTRAIS[item.id];
   state.consumiveis.splice(indice, 1);
-  state.niveisMaos[PLANETAS[planetaId].mao] += 1;
-  for (const coringa of state.coringas) {
-    coringa.def.ganchos.aoUsarPlaneta?.({ state, coringa });
+  const resultado = def.aplicar(state);
+  if (resultado.erro) {
+    state.consumiveis.splice(indice, 0, item);
+    return resultado;
   }
   return {};
 }

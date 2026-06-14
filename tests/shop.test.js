@@ -16,8 +16,9 @@ function comLoja(semente = 1) {
 teste("shop: gera 2 itens válidos", () => {
   const state = comLoja();
   igual(state.loja.itens.length, 2);
+  const tipos = ["coringa", "planeta", "taro", "espectral"];
   for (const item of state.loja.itens) {
-    ok(item.tipo === "coringa" || item.tipo === "planeta", `tipo inválido: ${item.tipo}`);
+    ok(tipos.includes(item.tipo), `tipo inválido: ${item.tipo}`);
     ok(item.preco > 0);
   }
 });
@@ -37,7 +38,7 @@ teste("shop: comprar planeta vai para os consumíveis", () => {
   const state = comLoja();
   state.loja.itens[0] = { tipo: "planeta", id: "mercurio", preco: 3 };
   igual(comprarItem(state, 0), {});
-  igual(state.consumiveis, ["mercurio"]);
+  igual(state.consumiveis, [{ tipo: "planeta", id: "mercurio" }]);
 });
 
 teste("shop: bloqueia sem dinheiro e sem espaço", () => {
@@ -51,7 +52,7 @@ teste("shop: bloqueia sem dinheiro e sem espaço", () => {
   igual(comprarItem(state, 0).erro, "sem-espaco");
 
   state.loja.itens[1] = { tipo: "planeta", id: "venus", preco: 3 };
-  state.consumiveis = ["plutao", "marte"];
+  state.consumiveis = [{ tipo: "planeta", id: "plutao" }, { tipo: "planeta", id: "marte" }];
   igual(comprarItem(state, 1).erro, "sem-espaco");
 });
 
@@ -87,8 +88,9 @@ teste("shop: pacote abre opções e escolher devolve à loja", () => {
   igual(comprarPacote(state), {});
   igual(state.dinheiro, dinheiroAntes - PRECO_PACOTE);
   igual(state.fase, "pacote");
-  ok(state.pacote.tipo === "planeta" || state.pacote.tipo === "coringa");
-  const esperado = state.pacote.tipo === "planeta" ? 3 : 2;
+  ok(["planeta", "coringa", "taro", "espectral"].includes(state.pacote.tipo));
+  const tresOpcoes = state.pacote.tipo === "planeta" || state.pacote.tipo === "taro";
+  const esperado = tresOpcoes ? 3 : 2;
   igual(state.pacote.opcoes.length, esperado);
   igual(new Set(state.pacote.opcoes).size, esperado, "opções únicas");
 
@@ -96,8 +98,8 @@ teste("shop: pacote abre opções e escolher devolve à loja", () => {
   igual(escolherDoPacote(state, 0), {});
   igual(state.fase, "loja");
   igual(state.pacote, null);
-  if (tipo === "planeta") igual(state.consumiveis.length, 1);
-  else igual(state.coringas.length, 1);
+  if (tipo === "coringa") igual(state.coringas.length, 1);
+  else igual(state.consumiveis.length, 1);
   igual(comprarPacote(state).erro, "ja-aberto", "um pacote por visita");
 });
 

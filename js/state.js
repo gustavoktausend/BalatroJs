@@ -2,7 +2,7 @@ import { sortearChefes } from "./engine/blinds.js";
 import { MAOS } from "./data/hands.js";
 import { CORINGAS } from "./data/jokers.js";
 
-export const VERSAO_SAVE = 1;
+export const VERSAO_SAVE = 2;
 const CHAVE_SAVE = "balatrojs-save";
 
 export function criarRun(semente = Date.now() % 2 ** 31) {
@@ -17,7 +17,7 @@ export function criarRun(semente = Date.now() % 2 ** 31) {
     chefesPorAnte: [],
     dinheiro: 4,
     coringas: [],     // instâncias { id, dados, def }
-    consumiveis: [],  // ids de planetas (máx. 2)
+    consumiveis: [],  // { tipo: "planeta"|"taro"|"espectral", id } — máx. 2
     niveisMaos: Object.fromEntries(Object.keys(MAOS).map((m) => [m, 1])),
     estatisticas: { porMao: {}, melhorJogada: 0, rodadas: 0 },
     ultimaMaoJogada: null,

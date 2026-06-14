@@ -89,6 +89,9 @@
   background: linear-gradient(160deg, #1d4a6b, #102a3e);
   border: 2px solid #3e7ca6;
 }
+.consumivel--planeta { border-color: var(--azul); }
+.consumivel--taro { border-color: #b072d6; }
+.consumivel--espectral { border-color: #6fe0ff; }
 .consumivel .botoes, .coringa .vender {
   position: absolute;
   top: 35%;

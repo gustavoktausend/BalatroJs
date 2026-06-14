@@ -2,10 +2,12 @@ import { app, atualizar } from "../app.js";
 import { NAIPES_VERMELHOS, SIMBOLO_NAIPE, rotuloDaCarta } from "../engine/deck.js";
 import { MAOS } from "../data/hands.js";
 import { PLANETAS } from "../data/planets.js";
+import { TAROS } from "../data/taros.js";
+import { ESPECTRAIS } from "../data/espectrais.js";
 import { precoVenda } from "../engine/economy.js";
 import { codificarSeed } from "../engine/seed.js";
 import { venderCoringa, reordenarCoringas, MAX_CORINGAS, MAX_CONSUMIVEIS } from "../engine/shop.js";
-import { usarPlaneta } from "../engine/run.js";
+import { usarConsumivel } from "../engine/run.js";
 import { ligarTooltip } from "./tooltip.js";
 import { sufixoEstado } from "../data/jokers.js";
 
@@ -104,15 +106,24 @@ function descricaoCoringa(coringa) {
   return coringa.def.descricao + sufixoEstado(coringa.dados);
 }
 
-export function elementoConsumivel(planetaId, indice = null) {
-  const planeta = PLANETAS[planetaId];
-  const elemento = el("div", { classe: "consumivel" }, el("span", {}, planeta.nome));
-  const nivel = app.state ? app.state.niveisMaos[planeta.mao] : 1;
-  ligarTooltip(elemento,
-    `<strong>${planeta.nome}</strong><br>Sobe o nível de ${MAOS[planeta.mao].nome} (nível atual: ${nivel})`);
+export function elementoConsumivel(consumivel, indice = null) {
+  const { tipo, id } = consumivel;
+  let nome, descricaoHtml;
+  if (tipo === "planeta") {
+    const planeta = PLANETAS[id];
+    const nivel = app.state ? app.state.niveisMaos[planeta.mao] : 1;
+    nome = planeta.nome;
+    descricaoHtml = `Sobe o nível de ${MAOS[planeta.mao].nome} (nível atual: ${nivel})`;
+  } else {
+    const def = tipo === "taro" ? TAROS[id] : ESPECTRAIS[id];
+    nome = def.nome;
+    descricaoHtml = def.descricao;
+  }
+  const elemento = el("div", { classe: `consumivel consumivel--${tipo}` }, el("span", {}, nome));
+  ligarTooltip(elemento, `<strong>${nome}</strong><br>${descricaoHtml}`);
   if (indice !== null) {
     elemento.addEventListener("click", () => {
-      usarPlaneta(app.state, indice);
+      usarConsumivel(app.state, indice);
       atualizar();
     });
   }
@@ -130,7 +141,7 @@ export function fileiraCoringas(state) {
 
 export function fileiraConsumiveis(state) {
   const fileira = el("div", { classe: "consumiveis" });
-  state.consumiveis.forEach((id, i) => fileira.append(elementoConsumivel(id, i)));
+  state.consumiveis.forEach((consumivel, i) => fileira.append(elementoConsumivel(consumivel, i)));
   for (let i = state.consumiveis.length; i < MAX_CONSUMIVEIS; i++) {
     fileira.append(el("div", { classe: "slot-vazio" }));
   }
