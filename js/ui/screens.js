@@ -14,6 +14,8 @@ import { MAOS, valoresDaMao } from "../data/hands.js";
 import { detectarMao } from "../engine/poker.js";
 import { NAIPES, SIMBOLO_NAIPE, rotuloDaCarta } from "../engine/deck.js";
 import { animarJogada } from "./animate.js";
+import { BARALHOS } from "../data/baralhos.js";
+import { STAKES } from "../data/stakes.js";
 
 export function mostrarTela(state) {
   const fase = state ? state.fase : "titulo";
@@ -31,28 +33,37 @@ function secaoDe(fase) {
 function renderTitulo() {
   const secao = secaoDe("titulo");
   const campoSeed = el("input", {
-    id: "campo-seed",
-    classe: "campo-seed",
-    type: "text",
-    placeholder: "Seed (opcional)",
-    maxlength: "8", // folga p/ espaços colados; decodificarSeed faz trim e exige 6 chars
+    id: "campo-seed", classe: "campo-seed", type: "text",
+    placeholder: "Seed (opcional)", maxlength: "8",
   });
-  // Nome distinto de `jogar` (importado de run.js) para não sombrear o import.
+
+  const seletor = (classe, dados) => el("select", { classe },
+    ...Object.values(dados).map((d) => el("option", { value: d.id }, d.nome)),
+  );
+  const selBaralho = seletor("campo-seed seletor-run", BARALHOS);
+  const selStake = seletor("campo-seed seletor-run", STAKES);
+  const descBaralho = el("p", { classe: "descricao" }, BARALHOS.padrao.descricao);
+  const descStake = el("p", { classe: "descricao" }, STAKES.branco.descricao);
+  selBaralho.addEventListener("change", () => { descBaralho.textContent = BARALHOS[selBaralho.value].descricao; });
+  selStake.addEventListener("change", () => { descStake.textContent = STAKES[selStake.value].descricao; });
+
   function iniciarJogo() {
     const valor = campoSeed.value.trim();
-    if (valor === "") {
-      app.state = criarRun();
-    } else {
-      const semente = decodificarSeed(valor);
+    let semente;
+    if (valor !== "") {
+      semente = decodificarSeed(valor);
       if (semente === null) { avisar("seed-invalida"); return; }
-      app.state = criarRun(semente);
     }
+    app.state = criarRun(semente, selBaralho.value, selStake.value);
     atualizar();
   }
+
   secao.replaceChildren(
     el("h1", { classe: "logo" }, "BalatroJS"),
     el("p", { classe: "subtitulo" }, "um clone de estudo em JavaScript puro"),
     campoSeed,
+    el("label", { classe: "rotulo-seletor" }, "Baralho"), selBaralho, descBaralho,
+    el("label", { classe: "rotulo-seletor" }, "Stake"), selStake, descStake,
     el("button", { classe: "botao botao-azul", onclick: iniciarJogo }, "Jogar"),
   );
   const save = carregar();
@@ -82,7 +93,7 @@ function cartaoBlind(state, tipo) {
   const cartao = el("div", { classe: `cartao-blind ${tipo}${atual ? " atual" : ""}` },
     el("h3", {}, tipo === "chefe" ? CHEFES[chefeId].nome : NOME_BLIND[tipo]),
     tipo === "chefe" ? el("p", { classe: "descricao" }, CHEFES[chefeId].descricao) : null,
-    el("p", {}, "Alvo: ", el("span", { classe: "numero" }, alvoDaBlind(state.ante, tipo, chefeId).toLocaleString("pt-BR"))),
+    el("p", {}, "Alvo: ", el("span", { classe: "numero" }, alvoDaBlind(state.ante, tipo, chefeId, (STAKES[state.stake] || STAKES.branco).multAlvo).toLocaleString("pt-BR"))),
     el("p", { classe: "dinheiro" }, `Prêmio: $${PREMIOS[tipo]}`),
   );
   if (atual) {

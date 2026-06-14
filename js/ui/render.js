@@ -4,6 +4,8 @@ import { MAOS } from "../data/hands.js";
 import { PLANETAS } from "../data/planets.js";
 import { TAROS } from "../data/taros.js";
 import { ESPECTRAIS } from "../data/espectrais.js";
+import { BARALHOS } from "../data/baralhos.js";
+import { STAKES } from "../data/stakes.js";
 import { precoVenda } from "../engine/economy.js";
 import { codificarSeed } from "../engine/seed.js";
 import { venderCoringa, reordenarCoringas, MAX_CORINGAS, MAX_CONSUMIVEIS } from "../engine/shop.js";
@@ -65,6 +67,7 @@ export function cabecalhoRun(state) {
     el("span", { classe: "descricao" }, `Rodadas vencidas: ${state.estatisticas.rodadas}`),
     el("span", { classe: "descricao" }, `Seed: ${codificarSeed(state.semente)}`),
     el("button", { classe: "botao botao-mini", onclick: () => app.mostrarTabelaMaos(state) }, "Mãos"),
+    el("span", { classe: "descricao" }, `${(BARALHOS[state.baralho] || BARALHOS.padrao).nome} · ${(STAKES[state.stake] || STAKES.branco).nome}`),
   );
 }
 
