@@ -1,6 +1,6 @@
 import { teste, ok, igual } from "./harness.js";
 import { PLANETAS, PRECO_PLANETA } from "../js/data/planets.js";
-import { CORINGAS, novoCoringa, sufixoEstado } from "../js/data/jokers.js";
+import { CORINGAS, novoCoringa, sufixoEstado, corDoCoringa } from "../js/data/jokers.js";
 import { MAOS } from "../js/data/hands.js";
 
 teste("planets: 9 planetas, um por mão, preço $3", () => {
@@ -42,4 +42,24 @@ teste("jokers: sufixoEstado mostra cada campo de dados presente", () => {
   igual(sufixoEstado({ valor: 3 }), " (atual: $3)", "campo valor");
   // O caso que a versão antiga quebrava: dois campos ao mesmo tempo.
   igual(sufixoEstado({ mult: 5, x: 1.5 }), " (atual: +5, ×1.5)");
+});
+
+teste("jokers: corDoCoringa é determinística e bem formada", () => {
+  const a = corDoCoringa("coringa");
+  const b = corDoCoringa("coringa");
+  igual(a, b, "mesmo id → mesma cor");
+  ok(a.clara.startsWith("hsl("), "clara é hsl");
+  ok(a.escura.startsWith("hsl("), "escura é hsl");
+});
+
+teste("jokers: corDoCoringa — escura tem lightness menor que a clara", () => {
+  const { clara, escura } = corDoCoringa("obelisco");
+  const lightness = (s) => Number(s.match(/(\d+)%\)$/)[1]);
+  ok(lightness(escura) < lightness(clara), "escura mais escura");
+});
+
+teste("jokers: corDoCoringa espalha matizes entre ids diferentes", () => {
+  const matiz = (s) => Number(s.match(/hsl\((\d+)/)[1]);
+  const hs = ["coringa", "ganancioso", "obelisco", "holograma"].map((id) => matiz(corDoCoringa(id).clara));
+  igual(new Set(hs).size, hs.length, "matizes distintos para ids distintos");
 });

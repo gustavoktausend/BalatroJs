@@ -150,3 +150,12 @@ export function sufixoEstado(dados) {
   if (dados.valor !== undefined) partes.push(`$${dados.valor}`);
   return partes.length ? ` (atual: ${partes.join(", ")})` : "";
 }
+
+// Cor determinística de um Coringa, derivada do id (hash djb2 → matiz HSL).
+// Devolve { clara, escura } — mesma matiz, a escura com lightness menor (contorno).
+export function corDoCoringa(id) {
+  let hash = 5381;
+  for (let i = 0; i < id.length; i++) hash = ((hash << 5) + hash + id.charCodeAt(i)) >>> 0;
+  const matiz = hash % 360;
+  return { clara: `hsl(${matiz}, 65%, 60%)`, escura: `hsl(${matiz}, 65%, 35%)` };
+}
