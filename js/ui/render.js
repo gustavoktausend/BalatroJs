@@ -9,7 +9,7 @@ import { codificarSeed } from "../engine/seed.js";
 import { venderCoringa, reordenarCoringas, MAX_CORINGAS, MAX_CONSUMIVEIS } from "../engine/shop.js";
 import { usarConsumivel } from "../engine/run.js";
 import { ligarTooltip } from "./tooltip.js";
-import { sufixoEstado } from "../data/jokers.js";
+import { sufixoEstado, corDoCoringa } from "../data/jokers.js";
 
 // Criador de elementos: el("div", { classe: "x", onclick: fn, dataset: {...} }, ...filhos)
 export function el(tag, atributos = {}, ...filhos) {
@@ -22,6 +22,29 @@ export function el(tag, atributos = {}, ...filhos) {
   }
   elemento.append(...filhos.filter(Boolean));
   return elemento;
+}
+
+// Cria um ícone SVG de chapéu de jester nas cores dadas. SVG precisa de namespace,
+// então não usa o helper el() (que chama createElement). Decorativo (aria-hidden).
+const SVG_NS = "http://www.w3.org/2000/svg";
+function svgEl(tag, atributos) {
+  const node = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(atributos)) node.setAttribute(k, v);
+  return node;
+}
+export function svgCoringa(clara, escura) {
+  const svg = svgEl("svg", { viewBox: "0 0 48 48", class: "icone-coringa", "aria-hidden": "true" });
+  // Chapéu de jester: três pontas com guizos + faixa da base.
+  const chapeu = svgEl("path", {
+    d: "M24 6 L14 22 L8 14 L10 30 L38 30 L40 14 L34 22 Z",
+    fill: clara, stroke: escura, "stroke-width": "2", "stroke-linejoin": "round",
+  });
+  const faixa = svgEl("rect", { x: "8", y: "30", width: "32", height: "6", rx: "3", fill: escura });
+  const g1 = svgEl("circle", { cx: "8", cy: "13", r: "3", fill: escura });
+  const g2 = svgEl("circle", { cx: "24", cy: "5", r: "3", fill: escura });
+  const g3 = svgEl("circle", { cx: "40", cy: "13", r: "3", fill: escura });
+  svg.append(chapeu, faixa, g1, g2, g3);
+  return svg;
 }
 
 export function elementoCarta(carta) {
@@ -67,7 +90,9 @@ export function avisar(codigo) {
 // indice = null exibe sem interação (loja/pacote); com índice, permite vender e arrastar.
 export function elementoCoringa(coringa, indice = null) {
   const def = coringa.def;
+  const { clara, escura } = corDoCoringa(def.id);
   const elemento = el("div", { classe: `coringa raridade-${def.raridade}` },
+    svgCoringa(clara, escura),
     el("span", { classe: "nome" }, def.nome),
   );
   ligarTooltip(elemento,
