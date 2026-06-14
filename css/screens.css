@@ -144,3 +144,16 @@
 }
 .campo-seed::placeholder { color: var(--texto-suave); letter-spacing: normal; }
 .campo-seed:focus { outline: none; border-color: var(--dourado); }
+
+.tabela-maos { min-width: 320px; }
+.tabela-maos h3 { margin-bottom: 0.6rem; }
+.linha-mao {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.8rem;
+  align-items: center;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--painel-borda);
+}
+.linha-mao:last-child { border-bottom: none; }
+.linha-mao .nome-mao { font-weight: 600; }

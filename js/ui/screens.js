@@ -197,6 +197,24 @@ function aoDescartar(state) {
   atualizar();
 }
 
+export function mostrarTabelaMaos(state) {
+  const overlay = el("div", { classe: "overlay", onclick: () => overlay.remove() });
+  const painel = el("div", { classe: "painel-baralho tabela-maos", onclick: (e) => e.stopPropagation() },
+    el("h3", {}, "Mãos de pôquer"),
+    ...Object.keys(MAOS).map((tipo) => {
+      const nivel = state.niveisMaos[tipo];
+      const { chips, mult } = valoresDaMao(tipo, nivel);
+      return el("div", { classe: "linha-mao" },
+        el("span", { classe: "nome-mao" }, MAOS[tipo].nome),
+        el("span", { classe: "descricao" }, `nv. ${nivel}`),
+        el("span", {}, el("span", { classe: "numero chips" }, String(chips)), " × ", el("span", { classe: "numero mult" }, String(mult))),
+      );
+    }),
+  );
+  overlay.append(painel);
+  document.body.append(overlay);
+}
+
 function mostrarBaralho(state) {
   const overlay = el("div", { classe: "overlay", onclick: () => overlay.remove() },
     el("div", { classe: "painel-baralho" },

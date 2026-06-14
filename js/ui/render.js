@@ -64,6 +64,7 @@ export function cabecalhoRun(state) {
     el("span", {}, `Ante ${state.ante}/8`),
     el("span", { classe: "descricao" }, `Rodadas vencidas: ${state.estatisticas.rodadas}`),
     el("span", { classe: "descricao" }, `Seed: ${codificarSeed(state.semente)}`),
+    el("button", { classe: "botao botao-mini", onclick: () => app.mostrarTabelaMaos(state) }, "Mãos"),
   );
 }
 
