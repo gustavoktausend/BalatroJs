@@ -170,7 +170,9 @@ function painelLateral(state) {
 function versoBaralho(state) {
   const rodada = state.rodada;
   const restantes = rodada.baralho.length;
-  const total = rodada.mao.length + restantes;
+  // total fixo capturado na criação da rodada (run.js); fallback p/ saves antigos
+  // sem o campo: estima o total pelo que ainda existe (mão + monte).
+  const total = rodada.totalCartas ?? (rodada.mao.length + restantes);
   return el("div", { classe: "baralho-canto", title: "Ver cartas restantes", onclick: () => mostrarBaralho(state) },
     el("div", { classe: "pilha-verso" },
       el("div", { classe: "verso-carta", "aria-hidden": "true" }),
