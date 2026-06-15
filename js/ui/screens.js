@@ -126,9 +126,9 @@ function renderRodada(state) {
           el("button", { id: "btn-descartar", classe: "botao botao-vermelho", disabled: "", onclick: () => aoDescartar(state) }, "Descartar"),
           el("button", { classe: "botao botao-mini", onclick: () => { ordenarMao(state, "valor"); atualizar(); } }, "Valor"),
           el("button", { classe: "botao botao-mini", onclick: () => { ordenarMao(state, "naipe"); atualizar(); } }, "Naipe"),
-          el("button", { classe: "botao botao-mini", onclick: () => mostrarBaralho(state) }, `Baralho: ${rodada.baralho.length}`),
         ),
       ),
+      versoBaralho(state),
     ),
   );
 }
@@ -162,6 +162,28 @@ function painelLateral(state) {
       el("div", { classe: "contador" }, el("span", { classe: "rotulo-contador" }, "Ante"), el("span", { classe: "numero" }, `${state.ante}/8`)),
     ),
   ];
+}
+
+// Verso de baralho no canto inferior direito: pilha decorativa (3 versos) + contagem
+// "restantes/total". Clicar abre o overlay de cartas restantes (mostrarBaralho).
+// O total é mao + monte (sem hardcode "52"), robusto p/ baralhos de tamanho diferente.
+function versoBaralho(state) {
+  const rodada = state.rodada;
+  const restantes = rodada.baralho.length;
+  // total fixo capturado na criação da rodada (run.js); fallback p/ saves antigos
+  // sem o campo: estima o total pelo que ainda existe (mão + monte).
+  const total = rodada.totalCartas ?? (rodada.mao.length + restantes);
+  return el("div", { classe: "baralho-canto", title: "Ver cartas restantes", onclick: () => mostrarBaralho(state) },
+    el("div", { classe: "pilha-verso" },
+      el("div", { classe: "verso-carta", "aria-hidden": "true" }),
+      el("div", { classe: "verso-carta", "aria-hidden": "true" }),
+      el("div", { classe: "verso-carta", "aria-hidden": "true" }),
+    ),
+    el("div", { classe: "baralho-contagem" },
+      el("span", { classe: "numero" }, String(restantes)),
+      el("span", { classe: "barra" }, `/${total}`),
+    ),
+  );
 }
 
 function cartaDaMao(state, carta, indice) {

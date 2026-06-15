@@ -31,6 +31,7 @@ export function iniciarBlind(state, tipo) {
     tiposJogados: [],
     ordenacao: "valor",
   };
+  state.rodada.totalCartas = state.rodada.baralho.length;
   reporMao(state);
   state.fase = "rodada";
 }
