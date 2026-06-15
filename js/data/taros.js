@@ -14,19 +14,19 @@ function subirMaoAleatoria(state, vezes) {
 }
 
 const LISTA = [
-  { id: "o-mundo", nome: "O Mundo", descricao: "Ganha $20.",
+  { id: "o-mundo", nome: "O Mundo", icone: "✷", descricao: "Ganha $20.",
     aplicar: (state) => { state.dinheiro += 20; return {}; } },
-  { id: "a-estrela", nome: "A Estrela", descricao: "Sobe 1 nível de uma mão aleatória.",
+  { id: "a-estrela", nome: "A Estrela", icone: "★", descricao: "Sobe 1 nível de uma mão aleatória.",
     aplicar: (state) => { subirMaoAleatoria(state, 1); return {}; } },
-  { id: "a-lua", nome: "A Lua", descricao: "Cria 1 Planeta aleatório.",
+  { id: "a-lua", nome: "A Lua", icone: "☾", descricao: "Cria 1 Planeta aleatório.",
     aplicar: (state) => {
       const id = escolher(state, Object.keys(PLANETAS));
       state.consumiveis.push({ tipo: "planeta", id });
       return {};
     } },
-  { id: "o-diabo", nome: "O Diabo", descricao: "Cria 1 Coringa comum.",
+  { id: "o-diabo", nome: "O Diabo", icone: "⛧", descricao: "Cria 1 Coringa comum.",
     aplicar: (state) => criarCoringaDe(state, "comum") },
-  { id: "a-roda", nome: "A Roda da Fortuna", descricao: "Chance de criar um Coringa incomum; senão +$5.",
+  { id: "a-roda", nome: "A Roda da Fortuna", icone: "☸", descricao: "Chance de criar um Coringa incomum; senão +$5.",
     aplicar: (state) => {
       // Se rolou "criar" mas não cabe/não há opção, cai para +$5 (consolação) — por spec.
       if (proximoAleatorio(state) < 0.5) {
@@ -36,7 +36,7 @@ const LISTA = [
       state.dinheiro += 5;
       return {};
     } },
-  { id: "a-temperanca", nome: "A Temperança", descricao: "Ganha o valor de venda dos seus Coringas (máx. $20).",
+  { id: "a-temperanca", nome: "A Temperança", icone: "⚖", descricao: "Ganha o valor de venda dos seus Coringas (máx. $20).",
     aplicar: (state) => {
       const soma = state.coringas.reduce((acc, c) => acc + precoVenda(c.def.preco), 0);
       state.dinheiro += Math.min(20, soma);

@@ -1,5 +1,7 @@
 import { teste, ok, igual } from "./harness.js";
 import { PLANETAS, PRECO_PLANETA } from "../js/data/planets.js";
+import { TAROS } from "../js/data/taros.js";
+import { ESPECTRAIS } from "../js/data/espectrais.js";
 import { CORINGAS, novoCoringa, sufixoEstado, corDoCoringa } from "../js/data/jokers.js";
 import { MAOS } from "../js/data/hands.js";
 
@@ -62,4 +64,16 @@ teste("jokers: corDoCoringa espalha matizes entre ids diferentes", () => {
   const matiz = (s) => Number(s.match(/hsl\((\d+)/)[1]);
   const hs = ["coringa", "ganancioso", "obelisco", "holograma"].map((id) => matiz(corDoCoringa(id).clara));
   igual(new Set(hs).size, hs.length, "matizes distintos para ids distintos");
+});
+
+teste("consumiveis: todo planeta/tarô/espectral tem ícone (glifo não vazio)", () => {
+  // PLANETAS/TAROS/ESPECTRAIS são todos mapas id→def (taros/espectrais via
+  // Object.fromEntries(LISTA…)). Iteramos Object.values uniformemente.
+  const grupos = { planeta: PLANETAS, taro: TAROS, espectral: ESPECTRAIS };
+  for (const [tipo, mapa] of Object.entries(grupos)) {
+    for (const def of Object.values(mapa)) {
+      ok(typeof def.icone === "string" && def.icone.trim().length > 0,
+        `${tipo} sem ícone: ${def.nome}`);
+    }
+  }
 });

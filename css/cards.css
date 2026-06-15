@@ -88,7 +88,21 @@
 .consumivel {
   background: linear-gradient(160deg, #1d4a6b, #102a3e);
   border: 2px solid #3e7ca6;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
+.consumivel .nome { width: 100%; }
+.icone-consumivel {
+  font-size: 2.6rem;
+  line-height: 1;
+  margin-top: 6px;
+  color: var(--texto);
+  pointer-events: none;
+}
+.consumivel--planeta .icone-consumivel { color: var(--azul); }
+.consumivel--taro .icone-consumivel { color: #b072d6; }
+.consumivel--espectral .icone-consumivel { color: #6fe0ff; }
 .consumivel--planeta { border-color: var(--azul); }
 .consumivel--taro { border-color: #b072d6; }
 .consumivel--espectral { border-color: #6fe0ff; }
@@ -139,6 +153,7 @@
     height: 108px;
   }
   .coringa, .consumivel, .voucher { font-size: 0.7rem; }
+  .icone-consumivel { font-size: 2.1rem; }
 }
 
 @media (max-width: 600px) {
@@ -153,4 +168,5 @@
     height: 74px;
   }
   .coringa, .consumivel, .voucher { font-size: 0.62rem; }
+  .icone-consumivel { font-size: 1.6rem; margin-top: 2px; }
 }

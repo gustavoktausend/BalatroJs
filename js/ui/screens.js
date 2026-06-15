@@ -74,6 +74,7 @@ function renderTitulo() {
 
 // ── Seleção de blind ────────────────────────────────────
 const NOME_BLIND = { pequena: "Aposta Pequena", grande: "Aposta Grande" };
+const ICONE_BLIND = { pequena: "●", grande: "◆", chefe: "☠" };
 
 function renderSelecaoBlind(state) {
   const secao = secaoDe("selecao-blind");
@@ -91,7 +92,11 @@ function cartaoBlind(state, tipo) {
   const chefeId = chefeDoAnte(state);
   const atual = state.proximaBlind === tipo;
   const cartao = el("div", { classe: `cartao-blind ${tipo}${atual ? " atual" : ""}` },
-    el("h3", {}, tipo === "chefe" ? CHEFES[chefeId].nome : NOME_BLIND[tipo]),
+    el("h3", {},
+      el("span", { classe: "icone-blind", "aria-hidden": "true" }, ICONE_BLIND[tipo]),
+      " ",
+      tipo === "chefe" ? CHEFES[chefeId].nome : NOME_BLIND[tipo],
+    ),
     tipo === "chefe" ? el("p", { classe: "descricao" }, CHEFES[chefeId].descricao) : null,
     el("p", {}, "Alvo: ", el("span", { classe: "numero" }, alvoDaBlind(state.ante, tipo, chefeId, (STAKES[state.stake] || STAKES.branco).multAlvo).toLocaleString("pt-BR"))),
     el("p", { classe: "dinheiro" }, `Prêmio: $${PREMIOS[tipo]}`),
@@ -139,7 +144,11 @@ function painelLateral(state) {
   const titulo = blind.tipo === "chefe" ? CHEFES[blind.chefeId].nome : NOME_BLIND[blind.tipo];
   return [
     el("div", { classe: "cartucho cartucho-blind" + (blind.tipo === "chefe" ? " chefe" : "") },
-      el("h3", {}, titulo),
+      el("h3", {},
+        el("span", { classe: "icone-blind", "aria-hidden": "true" }, ICONE_BLIND[blind.tipo]),
+        " ",
+        titulo,
+      ),
     ),
     el("div", { classe: "cartucho cartucho-alvo" },
       blind.tipo === "chefe" ? el("p", { classe: "descricao" }, CHEFES[blind.chefeId].descricao) : null,

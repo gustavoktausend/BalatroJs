@@ -137,18 +137,23 @@ function descricaoCoringa(coringa) {
 
 export function elementoConsumivel(consumivel, indice = null) {
   const { tipo, id } = consumivel;
-  let nome, descricaoHtml;
+  let nome, descricaoHtml, icone;
   if (tipo === "planeta") {
     const planeta = PLANETAS[id];
     const nivel = app.state ? app.state.niveisMaos[planeta.mao] : 1;
     nome = planeta.nome;
+    icone = planeta.icone;
     descricaoHtml = `Sobe o nível de ${MAOS[planeta.mao].nome} (nível atual: ${nivel})`;
   } else {
     const def = tipo === "taro" ? TAROS[id] : ESPECTRAIS[id];
     nome = def.nome;
+    icone = def.icone;
     descricaoHtml = def.descricao;
   }
-  const elemento = el("div", { classe: `consumivel consumivel--${tipo}` }, el("span", {}, nome));
+  const elemento = el("div", { classe: `consumivel consumivel--${tipo}` },
+    el("span", { classe: "icone-consumivel", "aria-hidden": "true" }, icone),
+    el("span", { classe: "nome" }, nome),
+  );
   ligarTooltip(elemento, `<strong>${nome}</strong><br>${descricaoHtml}`);
   if (indice !== null) {
     elemento.addEventListener("click", () => {

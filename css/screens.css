@@ -56,6 +56,7 @@
 }
 .cartao-blind.atual { opacity: 1; outline: 3px solid var(--dourado); }
 .cartao-blind.chefe h3 { color: var(--vermelho); }
+.icone-blind { font-size: 0.9em; opacity: 0.9; }
 
 .itens-loja { display: flex; gap: 1.2rem; align-items: stretch; }
 .cartao-item {
