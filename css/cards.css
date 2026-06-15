@@ -145,7 +145,8 @@
   .carta .pip { font-size: 1.7rem; }
   .carta .canto { font-size: 0.7rem; top: 3px; left: 4px; }
   .carta .canto.invertido { bottom: 3px; right: 4px; }
-  .mao .carta { margin-left: -14px; }
+  /* Aumenta overlap negativo para não estourar 360px: 60 + 7×42 = 354px */
+  .mao .carta { margin-left: -18px; }
 
   .coringa, .consumivel, .voucher, .slot-vazio {
     width: 56px;

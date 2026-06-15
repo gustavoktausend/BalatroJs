@@ -254,6 +254,8 @@
   .blinds { flex-wrap: wrap; justify-content: center; }
   .itens-loja { flex-wrap: wrap; justify-content: center; }
   .cabecalho-run { flex-wrap: wrap; justify-content: center; gap: 1rem; font-size: 1rem; }
+  /* Ajusta tamanho do verso para 76×106 (mesmo da carta a 900px) */
+  .pilha-verso { width: 76px; height: 106px; }
 }
 
 @media (max-width: 600px) {
