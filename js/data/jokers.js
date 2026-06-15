@@ -207,6 +207,8 @@ const LISTA = [
     } },
   { id: "misterioso", nome: "Coringa Misterioso", raridade: "incomum", preco: 6,
     descricao: "+mult aleatório de 0 a 23 a cada mão jogada",
+    // Único coringa que consome o RNG da run durante a pontuação (os demais usos de
+    // entre() ficam em aoFimDaRodada). A ordem dos coringas afeta o fluxo de RNG da mão.
     ganchos: { aoPontuarMao: (ctx) => ({ mult: entre(ctx.state, 0, 23) }) } },
 
   // ── Raros (3) ────────────────────────────────────────────────
