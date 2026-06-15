@@ -104,3 +104,43 @@ teste("scoring: eventos saem na ordem mão → cartas → coringas → total", (
   igual(eventos[3].tipo, "efeito");
   igual(eventos.at(-1).tipo, "total");
 });
+
+teste("scoring: steven-par soma só em valores pares (A=14 conta como ímpar)", () => {
+  const state = stateBase({ coringas: [novoCoringa("steven-par")] }); // +4 mult por par
+  const { total } = pontuarJogada(state, [carta("copas", 10), carta("ouros", 10)]);
+  igual(total, 30 * 10);
+  const s2 = stateBase({ coringas: [novoCoringa("steven-par")] });
+  const r2 = pontuarJogada(s2, [carta("copas", 14), carta("ouros", 14)]);
+  igual(r2.total, (10 + 11 + 11) * 2, "Ás é ímpar para o Steven Par");
+});
+
+teste("scoring: todd-impar soma em ímpares e no Ás", () => {
+  const state = stateBase({ coringas: [novoCoringa("todd-impar")] }); // +31 chips por ímpar
+  const { total } = pontuarJogada(state, [carta("copas", 14), carta("ouros", 14)]);
+  igual(total, (32 + 62) * 2);
+});
+
+teste("scoring: erudito dá chips e mult por Ás", () => {
+  const state = stateBase({ coringas: [novoCoringa("erudito")] });
+  const { total } = pontuarJogada(state, [carta("copas", 14), carta("ouros", 14)]);
+  igual(total, 72 * 10);
+});
+
+teste("scoring: cara-assustadora e cara-sorridente contam figuras", () => {
+  const a = stateBase({ coringas: [novoCoringa("cara-assustadora")] });
+  igual(pontuarJogada(a, [carta("copas", 13), carta("ouros", 13)]).total, 90 * 2);
+  const b = stateBase({ coringas: [novoCoringa("cara-sorridente")] });
+  igual(pontuarJogada(b, [carta("copas", 13), carta("ouros", 13)]).total, 30 * (2 + 5 + 5));
+});
+
+teste("scoring: walkie-talkie conta 10 e 4", () => {
+  const state = stateBase({ coringas: [novoCoringa("walkie-talkie")] });
+  igual(pontuarJogada(state, [carta("copas", 10), carta("ouros", 10)]).total, 50 * 10);
+});
+
+teste("scoring: fibonacci conta A/2/3/5/8", () => {
+  const state = stateBase({ coringas: [novoCoringa("fibonacci")] });
+  igual(pontuarJogada(state, [carta("copas", 5), carta("ouros", 5)]).total, 20 * 18);
+  const s2 = stateBase({ coringas: [novoCoringa("fibonacci")] });
+  igual(pontuarJogada(s2, [carta("copas", 4), carta("ouros", 4)]).total, (10 + 4 + 4) * 2);
+});

@@ -10,6 +10,17 @@ function seContem(alvo, efeito) {
   return (ctx) => (maoContem(ctx.jogada.tipo, alvo) ? efeito : null);
 }
 
+// Aplica um efeito fixo a cada carta pontuada que satisfaz o predicado.
+function porCarta(predicado, efeito) {
+  return (carta) => (predicado(carta) ? efeito : null);
+}
+
+// Paridade do valor para Steven Par / Todd Ímpar.
+// O Ás (14) conta como ÍMPAR, como no Balatro (e o 10 é par).
+function ehPar(carta) {
+  return carta.valor !== 14 && carta.valor % 2 === 0;
+}
+
 const LISTA = [
   // ── Comuns (14) ──────────────────────────────────────────────
   { id: "coringa", nome: "Coringa", raridade: "comum", preco: 3,
@@ -54,6 +65,24 @@ const LISTA = [
   { id: "banqueiro", nome: "Banqueiro", raridade: "comum", preco: 5,
     descricao: "+2 mult a cada $5 que você possui (máx. +20)",
     ganchos: { aoPontuarMao: (ctx) => ({ mult: Math.min(20, Math.floor(ctx.state.dinheiro / 5) * 2) }) } },
+  { id: "steven-par", nome: "Steven Par", raridade: "comum", preco: 4,
+    descricao: "+4 mult por carta de valor par (2,4,6,8,10) pontuada",
+    ganchos: { aoPontuarCarta: porCarta(ehPar, { mult: 4 }) } },
+  { id: "todd-impar", nome: "Todd Ímpar", raridade: "comum", preco: 4,
+    descricao: "+31 chips por carta de valor ímpar (A,3,5,7,9) pontuada",
+    ganchos: { aoPontuarCarta: porCarta((c) => !ehPar(c), { chips: 31 }) } },
+  { id: "cara-assustadora", nome: "Cara Assustadora", raridade: "comum", preco: 4,
+    descricao: "+30 chips por figura (J/Q/K) pontuada",
+    ganchos: { aoPontuarCarta: porCarta(ehFigura, { chips: 30 }) } },
+  { id: "cara-sorridente", nome: "Cara Sorridente", raridade: "comum", preco: 4,
+    descricao: "+5 mult por figura (J/Q/K) pontuada",
+    ganchos: { aoPontuarCarta: porCarta(ehFigura, { mult: 5 }) } },
+  { id: "erudito", nome: "Erudito", raridade: "comum", preco: 4,
+    descricao: "Cada Ás pontuado dá +20 chips e +4 mult",
+    ganchos: { aoPontuarCarta: porCarta((c) => c.valor === 14, { chips: 20, mult: 4 }) } },
+  { id: "walkie-talkie", nome: "Walkie Talkie", raridade: "comum", preco: 4,
+    descricao: "Cada 10 ou 4 pontuado dá +10 chips e +4 mult",
+    ganchos: { aoPontuarCarta: porCarta((c) => c.valor === 10 || c.valor === 4, { chips: 10, mult: 4 }) } },
 
   // ── Incomuns (8) ─────────────────────────────────────────────
   { id: "coringa-verde", nome: "Coringa Verde", raridade: "incomum", preco: 6,
@@ -105,6 +134,9 @@ const LISTA = [
   { id: "trapaceiro", nome: "Trapaceiro", raridade: "incomum", preco: 7,
     descricao: "×2 mult se a mão jogada já havia sido jogada nesta rodada",
     ganchos: { aoPontuarMao: (ctx) => (ctx.state.rodada.tiposJogados.includes(ctx.jogada.tipo) ? { xmult: 2 } : null) } },
+  { id: "fibonacci", nome: "Fibonacci", raridade: "incomum", preco: 7,
+    descricao: "+8 mult por carta de valor A, 2, 3, 5 ou 8 pontuada",
+    ganchos: { aoPontuarCarta: porCarta((c) => [14, 2, 3, 5, 8].includes(c.valor), { mult: 8 }) } },
 
   // ── Raros (3) ────────────────────────────────────────────────
   { id: "cavendish", nome: "Cavendish", raridade: "raro", preco: 8,
