@@ -54,6 +54,32 @@ subagent-driven: implementador → revisor spec → revisor qualidade.
 
 Testes após o polimento: `node tests/todos.js` → **72 teste(s), 0 falha(s)**.
 
+## Layout preenchido — Etapa 2 — CONCLUÍDA (2026-06-15)
+
+Frente executada em `feature/layout-etapa2` (plano
+`docs/superpowers/plans/2026-06-15-layout-preenchido-etapa2.md`, spec
+`docs/superpowers/specs/2026-06-15-layout-preenchido-etapa2-design.md`). Workflow
+subagent-driven: implementador (haiku) → revisor spec (sonnet) → revisor qualidade
+(sonnet) → revisão final da branch (opus). Merge `--no-ff` em `main`, branch apagada.
+
+- [x] Task 1 — `versoBaralho(state)` no canto inferior direito da `.mesa`; botão
+  "Baralho: N" removido dos controles (o verso assume o clique → `mostrarBaralho`).
+  Fix da revisão: `total` usa `rodada.totalCartas` (capturado na criação da rodada em
+  `run.js`, com fallback `??` p/ saves antigos) em vez de `mao+monte`, que encolhia.
+- [x] Task 2 — estilo do verso: `.mesa` relativa; pilha de 3 versos com padrão
+  diagonal dourado sobre `--vermelho-escuro`. Fix: pilha cresce p/ baixo-direita.
+- [x] Task 3 — cartas maiores (88×122 desktop / 76×106 ≤900px / 60×84 ≤600px),
+  overlap e `.pilha-verso` responsivos. Fix: overflow da mão a 360px (overlap base
+  −20px em screens.css) e `.pilha-verso` a 900px. Cleanup: removido overlap morto de
+  `cards.css` (media query não vencia a regra base de screens.css).
+
+**Validação visual no navegador (chrome-devtools, ambiente COM browser):**
+desktop 1280px — cartas 88×122, verso no canto com `44/52`, clique abre overlay,
+sem botão "Baralho"; mobile 360px — `scrollWidth === clientWidth` (sem overflow),
+verso 60×84. Screenshots conferidos.
+
+Testes após a Etapa 2: `node tests/todos.js` → **112 teste(s), 0 falha(s)**.
+
 ## Convenções (não esquecer nos prompts dos subagentes)
 
 - Código/comentários em português; zero dependências; ES modules sem build.
