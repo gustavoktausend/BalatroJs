@@ -15,13 +15,13 @@ teste("planets: 9 planetas, um por mão, preço $3", () => {
   igual(PLANETAS.netuno.mao, "sequencia-de-naipe");
 });
 
-teste("jokers: 50 coringas — 28 comuns, 16 incomuns, 6 raros", () => {
+teste("jokers: 49 coringas — 27 comuns, 16 incomuns, 6 raros", () => {
   const lista = Object.values(CORINGAS);
-  igual(lista.length, 50);
-  igual(lista.filter((c) => c.raridade === "comum").length, 28);
+  igual(lista.length, 49);
+  igual(lista.filter((c) => c.raridade === "comum").length, 27);
   igual(lista.filter((c) => c.raridade === "incomum").length, 16);
   igual(lista.filter((c) => c.raridade === "raro").length, 6);
-  igual(new Set(lista.map((c) => c.id)).size, 50, "ids únicos");
+  igual(new Set(lista.map((c) => c.id)).size, 49, "ids únicos");
   for (const c of lista) {
     ok(c.id && c.nome && c.descricao, `coringa incompleto: ${c.id}`);
     ok(c.preco >= 3 && c.preco <= 9, `preço fora da faixa: ${c.id}`);

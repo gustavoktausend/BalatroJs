@@ -105,19 +105,20 @@ teste("scoring: eventos saem na ordem mão → cartas → coringas → total", (
   igual(eventos.at(-1).tipo, "total");
 });
 
-teste("scoring: steven-par soma só em valores pares (A=14 conta como ímpar)", () => {
-  const state = stateBase({ coringas: [novoCoringa("steven-par")] }); // +4 mult por par
-  const { total } = pontuarJogada(state, [carta("copas", 10), carta("ouros", 10)]);
-  igual(total, 30 * 10);
+teste("scoring: steven-par soma só em pares numéricos (A e figuras não contam)", () => {
+  const state = stateBase({ coringas: [novoCoringa("steven-par")] }); // +4 mult por par numérico
+  igual(pontuarJogada(state, [carta("copas", 10), carta("ouros", 10)]).total, 30 * 10);
   const s2 = stateBase({ coringas: [novoCoringa("steven-par")] });
-  const r2 = pontuarJogada(s2, [carta("copas", 14), carta("ouros", 14)]);
-  igual(r2.total, (10 + 11 + 11) * 2, "Ás é ímpar para o Steven Par");
+  igual(pontuarJogada(s2, [carta("copas", 14), carta("ouros", 14)]).total, (10 + 11 + 11) * 2, "Ás é ímpar");
+  const s3 = stateBase({ coringas: [novoCoringa("steven-par")] });
+  igual(pontuarJogada(s3, [carta("copas", 12), carta("ouros", 12)]).total, 30 * 2, "Dama (figura) não conta");
 });
 
-teste("scoring: todd-impar soma em ímpares e no Ás", () => {
-  const state = stateBase({ coringas: [novoCoringa("todd-impar")] }); // +31 chips por ímpar
-  const { total } = pontuarJogada(state, [carta("copas", 14), carta("ouros", 14)]);
-  igual(total, (32 + 62) * 2);
+teste("scoring: todd-impar soma em ímpares numéricos e no Ás (figuras não contam)", () => {
+  const state = stateBase({ coringas: [novoCoringa("todd-impar")] }); // +31 chips por ímpar numérico
+  igual(pontuarJogada(state, [carta("copas", 14), carta("ouros", 14)]).total, (32 + 62) * 2);
+  const s2 = stateBase({ coringas: [novoCoringa("todd-impar")] });
+  igual(pontuarJogada(s2, [carta("copas", 13), carta("ouros", 13)]).total, 30 * 2, "Rei (figura) não conta");
 });
 
 teste("scoring: erudito dá chips e mult por Ás", () => {
@@ -126,11 +127,10 @@ teste("scoring: erudito dá chips e mult por Ás", () => {
   igual(total, 72 * 10);
 });
 
-teste("scoring: cara-assustadora e cara-sorridente contam figuras", () => {
+teste("scoring: cara-assustadora dá +30 chips por figura", () => {
   const a = stateBase({ coringas: [novoCoringa("cara-assustadora")] });
+  // par de reis: chips 10+10+10 + 30 + 30 = 90; mult 2
   igual(pontuarJogada(a, [carta("copas", 13), carta("ouros", 13)]).total, 90 * 2);
-  const b = stateBase({ coringas: [novoCoringa("cara-sorridente")] });
-  igual(pontuarJogada(b, [carta("copas", 13), carta("ouros", 13)]).total, 30 * (2 + 5 + 5));
 });
 
 teste("scoring: walkie-talkie conta 10 e 4", () => {
