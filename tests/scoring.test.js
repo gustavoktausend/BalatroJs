@@ -249,6 +249,6 @@ teste("scoring: campeao ganha ×0,1 por Quadra", () => {
   const quadra = () => [
     carta("copas", 9), carta("ouros", 9), carta("paus", 9), carta("espadas", 9),
   ];
-  igual(pontuarJogada(state, quadra()).total, Math.floor(96 * 7.7));
+  igual(pontuarJogada(state, quadra()).total, Math.floor(96 * (7 * 1.1)));
   igual(pontuarJogada(state, quadra()).total, Math.floor(96 * (7 * 1.2)));
 });
