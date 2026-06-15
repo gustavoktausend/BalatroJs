@@ -117,7 +117,6 @@ function renderRodada(state) {
     el("div", { classe: "mesa" },
       el("div", { classe: "topo" }, fileiraCoringas(state), fileiraConsumiveis(state)),
       el("div", { classe: "centro" },
-        el("div", { id: "previa-mao" }),
         el("div", { id: "area-jogada" }),
       ),
       el("div", { classe: "base" },
@@ -139,20 +138,29 @@ function painelLateral(state) {
   const blind = state.blindAtual;
   const titulo = blind.tipo === "chefe" ? CHEFES[blind.chefeId].nome : NOME_BLIND[blind.tipo];
   return [
-    el("div", { classe: "painel-blind" },
+    el("div", { classe: "cartucho cartucho-blind" + (blind.tipo === "chefe" ? " chefe" : "") },
       el("h3", {}, titulo),
+    ),
+    el("div", { classe: "cartucho cartucho-alvo" },
       blind.tipo === "chefe" ? el("p", { classe: "descricao" }, CHEFES[blind.chefeId].descricao) : null,
-      el("p", {}, "Alvo: ", el("span", { classe: "numero" }, blind.alvo.toLocaleString("pt-BR"))),
+      el("p", { classe: "rotulo-cartucho" }, "Pontue pelo menos"),
+      el("p", { classe: "numero alvo-valor" }, blind.alvo.toLocaleString("pt-BR")),
+      el("p", { classe: "recompensa" }, "Recompensa: ", el("span", { classe: "numero dinheiro" }, `$${PREMIOS[blind.tipo]}`)),
     ),
-    el("div", { classe: "painel-pontuacao" },
-      el("p", {}, "Rodada: ", el("span", { classe: "numero" }, rodada.pontuacao.toLocaleString("pt-BR"))),
+    el("div", { classe: "cartucho cartucho-score" },
+      el("p", { classe: "rotulo-cartucho" }, "Pontuação da rodada"),
+      // id p/ futura atualização ao vivo da pontuação (hoje re-renderiza via atualizar())
+      el("p", { classe: "numero score-valor", id: "score-rodada" }, rodada.pontuacao.toLocaleString("pt-BR")),
     ),
-    el("p", {},
-      "Mãos: ", el("span", { classe: "numero chips" }, String(rodada.maosRestantes)),
-      " · Descartes: ", el("span", { classe: "numero mult" }, String(rodada.descartesRestantes)),
+    el("div", { classe: "cartucho cartucho-mao" },
+      el("div", { id: "previa-mao" }),
     ),
-    el("p", { classe: "numero dinheiro" }, `$${state.dinheiro}`),
-    el("p", {}, `Ante ${state.ante}/8`),
+    el("div", { classe: "cartucho cartucho-contadores" },
+      el("div", { classe: "contador" }, el("span", { classe: "rotulo-contador" }, "Mãos"), el("span", { classe: "numero chips" }, String(rodada.maosRestantes))),
+      el("div", { classe: "contador" }, el("span", { classe: "rotulo-contador" }, "Descartes"), el("span", { classe: "numero mult" }, String(rodada.descartesRestantes))),
+      el("div", { classe: "contador" }, el("span", { classe: "rotulo-contador" }, "Dinheiro"), el("span", { classe: "numero dinheiro" }, `$${state.dinheiro}`)),
+      el("div", { classe: "contador" }, el("span", { classe: "rotulo-contador" }, "Ante"), el("span", { classe: "numero" }, `${state.ante}/8`)),
+    ),
   ];
 }
 
@@ -177,9 +185,15 @@ function atualizarControles(state) {
   document.getElementById("btn-descartar").disabled = selecao.size === 0 || rodada.descartesRestantes === 0;
   const previa = document.getElementById("previa-mao");
   if (selecao.size === 0) {
-    previa.replaceChildren();
+    // Estado ocioso: caixas zeradas e apagadas. O <small>&nbsp;</small> mantém a
+    // altura da linha igual à do estado com seleção, evitando salto de layout.
+    previa.classList.add("previa-ociosa");
+    previa.innerHTML =
+      `<span class="nome-mao">— <small>&nbsp;</small></span>` +
+      `<span class="numero chips">0</span> × <span class="numero mult">0</span>`;
     return;
   }
+  previa.classList.remove("previa-ociosa");
   const jogada = detectarMao([...selecao].map((i) => rodada.mao[i]));
   const nivel = state.niveisMaos[jogada.tipo];
   const { chips, mult } = valoresDaMao(jogada.tipo, nivel);
@@ -198,7 +212,6 @@ async function aoJogar(state) {
   }
   document.getElementById("btn-jogar").disabled = true;
   document.getElementById("btn-descartar").disabled = true;
-  document.getElementById("previa-mao").replaceChildren(); // libera o centro para a animação
   await animarJogada(cartas, resultado.eventos, document.getElementById("area-jogada"));
   if (resultado.vitoriaBlind) avisar(`Blind vencida! +$${resultado.recompensa}`);
   atualizar();
