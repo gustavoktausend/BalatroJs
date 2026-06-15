@@ -23,6 +23,7 @@ body {
   color: var(--texto);
   font-family: "Rubik", system-ui, sans-serif;
   user-select: none;
+  overflow-x: hidden; /* rede contra estouro lateral; cuidado: cria BFC e anula position:sticky em descendentes */
 }
 
 h1, h2, h3 { margin: 0.2em 0; }

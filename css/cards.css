@@ -148,8 +148,8 @@
   .mao .carta { margin-left: -12px; }
 
   .coringa, .consumivel, .voucher, .slot-vazio {
-    width: 72px;
-    height: 94px;
+    width: 56px;
+    height: 74px;
   }
   .coringa, .consumivel, .voucher { font-size: 0.62rem; }
 }
