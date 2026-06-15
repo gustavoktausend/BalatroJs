@@ -83,9 +83,11 @@ const LISTA = [
   { id: "coringa-alegre", nome: "Coringa Alegre", raridade: "comum", preco: 3,
     descricao: "+8 mult se a mão jogada contém um Par",
     ganchos: { aoPontuarMao: seContem("par", { mult: 8 }) } },
+  // Eco de chips do par-certeiro com preço menor (paralelo intencional do Balatro).
   { id: "coringa-astuto", nome: "Coringa Astuto", raridade: "comum", preco: 3,
     descricao: "+50 chips se a mão jogada contém um Par",
     ganchos: { aoPontuarMao: seContem("par", { chips: 50 }) } },
+  // Variante de mult da trinca-forte (paralelo intencional do Balatro).
   { id: "coringa-travesso", nome: "Coringa Travesso", raridade: "comum", preco: 4,
     descricao: "+12 mult se a mão jogada contém uma Trinca",
     ganchos: { aoPontuarMao: seContem("trinca", { mult: 12 }) } },
@@ -160,6 +162,7 @@ const LISTA = [
     ganchos: { aoPontuarCarta: porCarta((c) => [14, 2, 3, 5, 8].includes(c.valor), { mult: 8 }) } },
   { id: "estencil", nome: "Estêncil", raridade: "incomum", preco: 7,
     descricao: "×mult igual ao número de slots de Coringa vazios + 1",
+    // 5 = MAX_CORINGAS (shop.js); literal aqui para não importar shop.js (evita ciclo).
     ganchos: { aoPontuarMao: (ctx) => ({ xmult: (5 - ctx.state.coringas.length) + 1 }) } },
   { id: "abstrato", nome: "Coringa Abstrato", raridade: "incomum", preco: 6,
     descricao: "+3 mult por Coringa que você possui",
@@ -189,6 +192,7 @@ const LISTA = [
       aoComprarCoringa: (ctx) => { ctx.coringa.dados.x = +(ctx.coringa.dados.x + 0.25).toFixed(2); },
       aoPontuarMao: (ctx) => ({ xmult: ctx.coringa.dados.x }),
     } },
+  // Sem teto (ao contrário do banqueiro) — intencional para um raro.
   { id: "coturno", nome: "Coturno", raridade: "raro", preco: 8,
     descricao: "+2 mult por cada $5 que você possui",
     ganchos: { aoPontuarMao: (ctx) => ({ mult: 2 * Math.floor(ctx.state.dinheiro / 5) }) } },

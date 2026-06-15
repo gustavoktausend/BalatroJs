@@ -25,6 +25,8 @@ const CONTEM = {
   "dois-pares": ["dois-pares", "full-house"],
   "trinca":     ["trinca", "full-house", "quadra"],
   "sequencia":  ["sequencia", "sequencia-de-naipe"],
+  // "flush" ausente de propósito: cai no fallback [alvo] (só Flush exato), sem herdar
+  // sequencia-de-naipe — coringas de flush não disparam em sequência de naipe.
 };
 
 export function maoContem(tipoJogado, alvo) {
