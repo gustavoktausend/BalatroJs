@@ -116,7 +116,10 @@ function renderRodada(state) {
     el("aside", { classe: "lateral" }, ...painelLateral(state)),
     el("div", { classe: "mesa" },
       el("div", { classe: "topo" }, fileiraCoringas(state), fileiraConsumiveis(state)),
-      el("div", { classe: "centro", id: "area-jogada" }),
+      el("div", { classe: "centro" },
+        el("div", { id: "previa-mao" }),
+        el("div", { id: "area-jogada" }),
+      ),
       el("div", { classe: "base" },
         el("div", { classe: "mao" }, ...rodada.mao.map((carta, i) => cartaDaMao(state, carta, i))),
         el("div", { classe: "controles" },
@@ -143,7 +146,6 @@ function painelLateral(state) {
     ),
     el("div", { classe: "painel-pontuacao" },
       el("p", {}, "Rodada: ", el("span", { classe: "numero" }, rodada.pontuacao.toLocaleString("pt-BR"))),
-      el("div", { id: "previa-mao" }),
     ),
     el("p", {},
       "Mãos: ", el("span", { classe: "numero chips" }, String(rodada.maosRestantes)),
@@ -196,6 +198,7 @@ async function aoJogar(state) {
   }
   document.getElementById("btn-jogar").disabled = true;
   document.getElementById("btn-descartar").disabled = true;
+  document.getElementById("previa-mao").replaceChildren(); // libera o centro para a animação
   await animarJogada(cartas, resultado.eventos, document.getElementById("area-jogada"));
   if (resultado.vitoriaBlind) avisar(`Blind vencida! +$${resultado.recompensa}`);
   atualizar();
