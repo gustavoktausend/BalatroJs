@@ -1,8 +1,8 @@
 /* Carta de baralho */
 .carta {
   position: relative;
-  width: 72px;
-  height: 100px;
+  width: 88px;
+  height: 122px;
   flex: none;
   background: #f8f5ec;
   color: #1b1b1b;
@@ -16,7 +16,7 @@
   position: absolute;
   top: 5px;
   left: 6px;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1.05;
   text-align: center;
@@ -34,7 +34,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.1rem;
+  font-size: 2.5rem;
 }
 .carta.selecionada {
   transform: translateY(-18px);
@@ -128,10 +128,10 @@
 
 /* ── Responsivo ───────────────────────────────── */
 @media (max-width: 900px) {
-  .carta { width: 62px; height: 86px; }
-  .carta .pip { font-size: 1.8rem; }
-  .carta .canto { font-size: 0.75rem; }
-  .mao .carta { margin-left: -14px; }
+  .carta { width: 76px; height: 106px; }
+  .carta .pip { font-size: 2.1rem; }
+  .carta .canto { font-size: 0.85rem; }
+  .mao .carta { margin-left: -18px; }
 
   .coringa, .consumivel, .voucher, .slot-vazio {
     width: 84px;
@@ -141,11 +141,11 @@
 }
 
 @media (max-width: 600px) {
-  .carta { width: 52px; height: 72px; }
-  .carta .pip { font-size: 1.5rem; }
-  .carta .canto { font-size: 0.65rem; top: 3px; left: 4px; }
+  .carta { width: 60px; height: 84px; }
+  .carta .pip { font-size: 1.7rem; }
+  .carta .canto { font-size: 0.7rem; top: 3px; left: 4px; }
   .carta .canto.invertido { bottom: 3px; right: 4px; }
-  .mao .carta { margin-left: -12px; }
+  .mao .carta { margin-left: -14px; }
 
   .coringa, .consumivel, .voucher, .slot-vazio {
     width: 56px;

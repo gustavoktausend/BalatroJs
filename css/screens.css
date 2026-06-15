@@ -164,7 +164,7 @@
 }
 .base { display: flex; flex-direction: column; align-items: center; }
 .mao { display: flex; padding-top: 20px; }
-.mao .carta { margin-left: -16px; }
+.mao .carta { margin-left: -20px; }
 .mao .carta:first-child { margin-left: 0; }
 .mao .carta:hover { transform: translateY(-8px); }
 .mao .carta.selecionada:hover { transform: translateY(-18px); }
@@ -282,6 +282,8 @@
   .centro { min-height: 120px; }
   .topo { gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
   .coringas, .consumiveis { flex-wrap: wrap; justify-content: center; }
+  .pilha-verso { width: 60px; height: 84px; }
+  .baralho-contagem { font-size: 0.75rem; }
 
   /* Demais telas empilham */
   .cartao-blind { width: 100%; max-width: 320px; }
