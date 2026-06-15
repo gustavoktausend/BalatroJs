@@ -144,3 +144,66 @@ teste("scoring: fibonacci conta A/2/3/5/8", () => {
   const s2 = stateBase({ coringas: [novoCoringa("fibonacci")] });
   igual(pontuarJogada(s2, [carta("copas", 4), carta("ouros", 4)]).total, (10 + 4 + 4) * 2);
 });
+
+teste("scoring: coringa-alegre e coringa-astuto exigem Par", () => {
+  const alegre = stateBase({ coringas: [novoCoringa("coringa-alegre")] });
+  igual(pontuarJogada(alegre, [carta("copas", 9), carta("ouros", 9)]).total, 28 * (2 + 8));
+  const semPar = stateBase({ coringas: [novoCoringa("coringa-alegre")] });
+  igual(pontuarJogada(semPar, [carta("copas", 9), carta("ouros", 2)]).total, (5 + 9) * 1);
+  const astuto = stateBase({ coringas: [novoCoringa("coringa-astuto")] });
+  igual(pontuarJogada(astuto, [carta("copas", 9), carta("ouros", 9)]).total, (28 + 50) * 2);
+});
+
+teste("scoring: coringa-travesso exige Trinca", () => {
+  const state = stateBase({ coringas: [novoCoringa("coringa-travesso")] });
+  const cartas = [carta("copas", 9), carta("ouros", 9), carta("paus", 9)];
+  igual(pontuarJogada(state, cartas).total, 57 * 15);
+});
+
+teste("scoring: coringa-diabrete e coringa-malandro exigem Flush", () => {
+  const flush = () => [
+    carta("copas", 2), carta("copas", 5), carta("copas", 7),
+    carta("copas", 9), carta("copas", 11),
+  ];
+  const dia = stateBase({ coringas: [novoCoringa("coringa-diabrete")] });
+  igual(pontuarJogada(dia, flush()).total, 68 * 14);
+  const mal = stateBase({ coringas: [novoCoringa("coringa-malandro")] });
+  igual(pontuarJogada(mal, flush()).total, (68 + 80) * 4);
+  const semFlush = stateBase({ coringas: [novoCoringa("coringa-diabrete")] });
+  igual(pontuarJogada(semFlush, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 2);
+});
+
+teste("scoring: coringa-devoto exige Sequência", () => {
+  const state = stateBase({ coringas: [novoCoringa("coringa-devoto")] });
+  const seq = [
+    carta("copas", 5), carta("ouros", 6), carta("paus", 7),
+    carta("espadas", 8), carta("copas", 9),
+  ];
+  igual(pontuarJogada(state, seq).total, 165 * 4);
+});
+
+teste("scoring: arena e coturno usam o dinheiro do jogador", () => {
+  const arena = stateBase({ coringas: [novoCoringa("arena")], dinheiro: 7 });
+  igual(pontuarJogada(arena, [carta("copas", 9), carta("ouros", 9)]).total, 42 * 2);
+  const coturno = stateBase({ coringas: [novoCoringa("coturno")], dinheiro: 12 });
+  igual(pontuarJogada(coturno, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 6);
+});
+
+teste("scoring: acrobata só na última mão", () => {
+  const ultima = stateBase({ coringas: [novoCoringa("acrobata")] });
+  ultima.rodada.maosRestantes = 1;
+  igual(pontuarJogada(ultima, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 2 * 3);
+  const naoUltima = stateBase({ coringas: [novoCoringa("acrobata")] });
+  naoUltima.rodada.maosRestantes = 2;
+  igual(pontuarJogada(naoUltima, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 2);
+});
+
+teste("scoring: estencil multiplica por slots vazios + 1", () => {
+  const state = stateBase({ coringas: [novoCoringa("estencil")] });
+  igual(pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 2 * 5);
+});
+
+teste("scoring: abstrato soma por coringa possuído", () => {
+  const state = stateBase({ coringas: [novoCoringa("abstrato"), novoCoringa("coringa")] });
+  igual(pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 12);
+});

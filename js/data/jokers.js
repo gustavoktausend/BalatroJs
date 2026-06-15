@@ -80,6 +80,30 @@ const LISTA = [
   { id: "walkie-talkie", nome: "Walkie Talkie", raridade: "comum", preco: 4,
     descricao: "Cada 10 ou 4 pontuado dá +10 chips e +4 mult",
     ganchos: { aoPontuarCarta: porCarta((c) => c.valor === 10 || c.valor === 4, { chips: 10, mult: 4 }) } },
+  { id: "coringa-alegre", nome: "Coringa Alegre", raridade: "comum", preco: 3,
+    descricao: "+8 mult se a mão jogada contém um Par",
+    ganchos: { aoPontuarMao: seContem("par", { mult: 8 }) } },
+  { id: "coringa-astuto", nome: "Coringa Astuto", raridade: "comum", preco: 3,
+    descricao: "+50 chips se a mão jogada contém um Par",
+    ganchos: { aoPontuarMao: seContem("par", { chips: 50 }) } },
+  { id: "coringa-travesso", nome: "Coringa Travesso", raridade: "comum", preco: 4,
+    descricao: "+12 mult se a mão jogada contém uma Trinca",
+    ganchos: { aoPontuarMao: seContem("trinca", { mult: 12 }) } },
+  { id: "coringa-diabrete", nome: "Coringa Diabrete", raridade: "comum", preco: 4,
+    descricao: "+10 mult se a mão jogada é Naipe (Flush)",
+    ganchos: { aoPontuarMao: seContem("flush", { mult: 10 }) } },
+  { id: "coringa-malandro", nome: "Coringa Malandro", raridade: "comum", preco: 4,
+    descricao: "+80 chips se a mão jogada é Naipe (Flush)",
+    ganchos: { aoPontuarMao: seContem("flush", { chips: 80 }) } },
+  { id: "coringa-devoto", nome: "Coringa Devoto", raridade: "comum", preco: 4,
+    descricao: "+100 chips se a mão jogada contém uma Sequência",
+    ganchos: { aoPontuarMao: seContem("sequencia", { chips: 100 }) } },
+  { id: "arena", nome: "Arena", raridade: "comum", preco: 5,
+    descricao: "+2 chips por cada $1 que você possui",
+    ganchos: { aoPontuarMao: (ctx) => ({ chips: 2 * ctx.state.dinheiro }) } },
+  { id: "acrobata", nome: "Acrobata", raridade: "comum", preco: 5,
+    descricao: "×3 mult na última mão da rodada",
+    ganchos: { aoPontuarMao: (ctx) => (ctx.state.rodada.maosRestantes === 1 ? { xmult: 3 } : null) } },
 
   // ── Incomuns (8) ─────────────────────────────────────────────
   { id: "coringa-verde", nome: "Coringa Verde", raridade: "incomum", preco: 6,
@@ -134,6 +158,12 @@ const LISTA = [
   { id: "fibonacci", nome: "Fibonacci", raridade: "incomum", preco: 7,
     descricao: "+8 mult por carta de valor A, 2, 3, 5 ou 8 pontuada",
     ganchos: { aoPontuarCarta: porCarta((c) => [14, 2, 3, 5, 8].includes(c.valor), { mult: 8 }) } },
+  { id: "estencil", nome: "Estêncil", raridade: "incomum", preco: 7,
+    descricao: "×mult igual ao número de slots de Coringa vazios + 1",
+    ganchos: { aoPontuarMao: (ctx) => ({ xmult: (5 - ctx.state.coringas.length) + 1 }) } },
+  { id: "abstrato", nome: "Coringa Abstrato", raridade: "incomum", preco: 6,
+    descricao: "+3 mult por Coringa que você possui",
+    ganchos: { aoPontuarMao: (ctx) => ({ mult: 3 * ctx.state.coringas.length }) } },
 
   // ── Raros (3) ────────────────────────────────────────────────
   { id: "cavendish", nome: "Cavendish", raridade: "raro", preco: 8,
@@ -159,6 +189,9 @@ const LISTA = [
       aoComprarCoringa: (ctx) => { ctx.coringa.dados.x = +(ctx.coringa.dados.x + 0.25).toFixed(2); },
       aoPontuarMao: (ctx) => ({ xmult: ctx.coringa.dados.x }),
     } },
+  { id: "coturno", nome: "Coturno", raridade: "raro", preco: 8,
+    descricao: "+2 mult por cada $5 que você possui",
+    ganchos: { aoPontuarMao: (ctx) => ({ mult: 2 * Math.floor(ctx.state.dinheiro / 5) }) } },
 ];
 
 export const CORINGAS = Object.fromEntries(LISTA.map((c) => [c.id, c]));
