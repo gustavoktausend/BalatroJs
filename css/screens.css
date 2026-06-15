@@ -235,8 +235,10 @@
     padding: 0.7rem;
   }
   .cartucho { flex: 1 1 45%; padding: 0.5rem; }
-  #previa-mao { font-size: 1.4rem; }
-  #previa-mao .nome-mao { font-size: 1.1rem; }
+  .cartucho-mao, .cartucho-contadores { flex: 1 1 100%; }
+  .cartucho-alvo .alvo-valor { font-size: 1.2rem; }
+  .score-valor { font-size: 1.5rem; }
+  #previa-mao .chips, #previa-mao .mult { font-size: 1.2rem; min-width: 2.4rem; padding: 0.3rem 0.5rem; }
 
   .mesa { min-height: auto; gap: 0.7rem; }
   .centro { min-height: 120px; }
