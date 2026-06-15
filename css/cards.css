@@ -131,7 +131,8 @@
   .carta { width: 76px; height: 106px; }
   .carta .pip { font-size: 2.1rem; }
   .carta .canto { font-size: 0.85rem; }
-  .mao .carta { margin-left: -18px; }
+  /* O overlap da mão vem de screens.css (.mao .carta), carregado depois — não
+     repetir aqui: media query não aumenta especificidade e a regra base venceria. */
 
   .coringa, .consumivel, .voucher, .slot-vazio {
     width: 84px;
@@ -145,8 +146,7 @@
   .carta .pip { font-size: 1.7rem; }
   .carta .canto { font-size: 0.7rem; top: 3px; left: 4px; }
   .carta .canto.invertido { bottom: 3px; right: 4px; }
-  /* Aumenta overlap negativo para não estourar 360px: 60 + 7×42 = 354px */
-  .mao .carta { margin-left: -18px; }
+  /* Overlap da mão fica em screens.css; com -20px a 360px: 60 + 7×40 = 340px (cabe). */
 
   .coringa, .consumivel, .voucher, .slot-vazio {
     width: 56px;
