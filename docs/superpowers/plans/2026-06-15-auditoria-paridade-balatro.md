@@ -52,7 +52,7 @@ Legenda: ✅ existe · 🟡 parcial · ❌ ausente
 
 | Conteúdo | Balatro | Hoje | Status |
 |---|---|---|---|
-| Coringas (jokers) | ~150 | 25 (`jokers.js`) | 🟡 ~17% |
+| Coringas (jokers) | ~150 | 49 (`jokers.js`) | 🟡 ~33% (lote +24 feito 2026-06-15) |
 | Planetas | 12 (1 por mão, inclui as secretas) | 9 (`planets.js`) | 🟡 faltam 3 |
 | Tarôs | 22 | 6 (`taros.js`) | 🟡 ~27% |
 | Espectrais | 18 | 3 (`espectrais.js`) | 🟡 ~17% |
@@ -112,10 +112,10 @@ próprio (brainstorm → spec → plano → implementação). Marcados P1 (alto)
 - 🎯 **(P1) Edições** (foil/holographic/polychrome/negative) — em cartas e coringas.
   Mecânica relativamente isolada (um campo `edicao` + efeito no pipeline + visual
   brilhante). Alto impacto visual e estratégico, esforço médio.
-- 🎯 **(P1) Mais coringas** — subir de 25 para ~50+. O conteúdo que mais "enche" o
-  jogo. Aditivo e de baixo risco (cada coringa é um objeto com ganchos; o pipeline
-  já suporta). Pode ser feito em lotes. **Bom primeiro projeto pós-auditoria** por
-  ser puro conteúdo, baixo risco, e o motor já aguenta.
+- ✅ **(P1) Mais coringas** — **FEITO (2026-06-15): 25 → 49** (lote +24, só ganchos
+  atuais, sem mudança no engine; spec/plano `2026-06-15-mais-coringas-*`). Aditivo,
+  baixo risco, em lotes. Próximos lotes podem subir mais (rumo a ~150) — alguns
+  coringas novos vão querer edições/aprimoramentos (P1) primeiro.
 
 ### P2 — médio impacto
 

@@ -104,3 +104,163 @@ teste("scoring: eventos saem na ordem mão → cartas → coringas → total", (
   igual(eventos[3].tipo, "efeito");
   igual(eventos.at(-1).tipo, "total");
 });
+
+teste("scoring: steven-par soma só em pares numéricos (A e figuras não contam)", () => {
+  const state = stateBase({ coringas: [novoCoringa("steven-par")] }); // +4 mult por par numérico
+  igual(pontuarJogada(state, [carta("copas", 10), carta("ouros", 10)]).total, 30 * 10);
+  const s2 = stateBase({ coringas: [novoCoringa("steven-par")] });
+  igual(pontuarJogada(s2, [carta("copas", 14), carta("ouros", 14)]).total, (10 + 11 + 11) * 2, "Ás é ímpar");
+  const s3 = stateBase({ coringas: [novoCoringa("steven-par")] });
+  igual(pontuarJogada(s3, [carta("copas", 12), carta("ouros", 12)]).total, 30 * 2, "Dama (figura) não conta");
+});
+
+teste("scoring: todd-impar soma em ímpares numéricos e no Ás (figuras não contam)", () => {
+  const state = stateBase({ coringas: [novoCoringa("todd-impar")] }); // +31 chips por ímpar numérico
+  igual(pontuarJogada(state, [carta("copas", 14), carta("ouros", 14)]).total, (32 + 62) * 2);
+  const s2 = stateBase({ coringas: [novoCoringa("todd-impar")] });
+  igual(pontuarJogada(s2, [carta("copas", 13), carta("ouros", 13)]).total, 30 * 2, "Rei (figura) não conta");
+});
+
+teste("scoring: erudito dá chips e mult por Ás", () => {
+  const state = stateBase({ coringas: [novoCoringa("erudito")] });
+  const { total } = pontuarJogada(state, [carta("copas", 14), carta("ouros", 14)]);
+  igual(total, 72 * 10);
+});
+
+teste("scoring: cara-assustadora dá +30 chips por figura", () => {
+  const a = stateBase({ coringas: [novoCoringa("cara-assustadora")] });
+  // par de reis: chips 10+10+10 + 30 + 30 = 90; mult 2
+  igual(pontuarJogada(a, [carta("copas", 13), carta("ouros", 13)]).total, 90 * 2);
+});
+
+teste("scoring: walkie-talkie conta 10 e 4", () => {
+  const state = stateBase({ coringas: [novoCoringa("walkie-talkie")] });
+  igual(pontuarJogada(state, [carta("copas", 10), carta("ouros", 10)]).total, 50 * 10);
+});
+
+teste("scoring: fibonacci conta A/2/3/5/8", () => {
+  const state = stateBase({ coringas: [novoCoringa("fibonacci")] });
+  igual(pontuarJogada(state, [carta("copas", 5), carta("ouros", 5)]).total, 20 * 18);
+  const s2 = stateBase({ coringas: [novoCoringa("fibonacci")] });
+  igual(pontuarJogada(s2, [carta("copas", 4), carta("ouros", 4)]).total, (10 + 4 + 4) * 2);
+});
+
+teste("scoring: coringa-alegre e coringa-astuto exigem Par", () => {
+  const alegre = stateBase({ coringas: [novoCoringa("coringa-alegre")] });
+  igual(pontuarJogada(alegre, [carta("copas", 9), carta("ouros", 9)]).total, 28 * (2 + 8));
+  const semPar = stateBase({ coringas: [novoCoringa("coringa-alegre")] });
+  igual(pontuarJogada(semPar, [carta("copas", 9), carta("ouros", 2)]).total, (5 + 9) * 1);
+  const astuto = stateBase({ coringas: [novoCoringa("coringa-astuto")] });
+  igual(pontuarJogada(astuto, [carta("copas", 9), carta("ouros", 9)]).total, (28 + 50) * 2);
+});
+
+teste("scoring: coringa-travesso exige Trinca", () => {
+  const state = stateBase({ coringas: [novoCoringa("coringa-travesso")] });
+  const cartas = [carta("copas", 9), carta("ouros", 9), carta("paus", 9)];
+  igual(pontuarJogada(state, cartas).total, 57 * 15);
+});
+
+teste("scoring: coringa-diabrete e coringa-malandro exigem Flush", () => {
+  const flush = () => [
+    carta("copas", 2), carta("copas", 5), carta("copas", 7),
+    carta("copas", 9), carta("copas", 11),
+  ];
+  const dia = stateBase({ coringas: [novoCoringa("coringa-diabrete")] });
+  igual(pontuarJogada(dia, flush()).total, 68 * 14);
+  const mal = stateBase({ coringas: [novoCoringa("coringa-malandro")] });
+  igual(pontuarJogada(mal, flush()).total, (68 + 80) * 4);
+  const semFlush = stateBase({ coringas: [novoCoringa("coringa-diabrete")] });
+  igual(pontuarJogada(semFlush, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 2);
+});
+
+teste("scoring: coringa-devoto exige Sequência", () => {
+  const state = stateBase({ coringas: [novoCoringa("coringa-devoto")] });
+  const seq = [
+    carta("copas", 5), carta("ouros", 6), carta("paus", 7),
+    carta("espadas", 8), carta("copas", 9),
+  ];
+  igual(pontuarJogada(state, seq).total, 165 * 4);
+});
+
+teste("scoring: arena e coturno usam o dinheiro do jogador", () => {
+  const arena = stateBase({ coringas: [novoCoringa("arena")], dinheiro: 7 });
+  igual(pontuarJogada(arena, [carta("copas", 9), carta("ouros", 9)]).total, 42 * 2);
+  const coturno = stateBase({ coringas: [novoCoringa("coturno")], dinheiro: 12 });
+  igual(pontuarJogada(coturno, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 6);
+});
+
+teste("scoring: acrobata só na última mão", () => {
+  const ultima = stateBase({ coringas: [novoCoringa("acrobata")] });
+  ultima.rodada.maosRestantes = 1;
+  igual(pontuarJogada(ultima, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 2 * 3);
+  const naoUltima = stateBase({ coringas: [novoCoringa("acrobata")] });
+  naoUltima.rodada.maosRestantes = 2;
+  igual(pontuarJogada(naoUltima, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 2);
+});
+
+teste("scoring: estencil multiplica por slots vazios + 1", () => {
+  const state = stateBase({ coringas: [novoCoringa("estencil")] });
+  igual(pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 2 * 5);
+});
+
+teste("scoring: abstrato soma por coringa possuído", () => {
+  const state = stateBase({ coringas: [novoCoringa("abstrato"), novoCoringa("coringa")] });
+  igual(pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 12);
+});
+
+teste("scoring: cartao-fidelidade dá ×4 a cada 6 mãos", () => {
+  const c = novoCoringa("cartao-fidelidade");
+  const state = stateBase({ coringas: [c] });
+  const jogar = () => pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]).total;
+  for (let i = 0; i < 5; i++) igual(jogar(), 28 * 2, `mão ${i + 1} sem bônus`);
+  igual(jogar(), 28 * 2 * 4, "6ª mão ativa ×4");
+});
+
+teste("scoring: bode acumula sem figura e zera com figura", () => {
+  const c = novoCoringa("bode");
+  const state = stateBase({ coringas: [c] });
+  igual(pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]).total, 28 * (2 + 1));
+  igual(pontuarJogada(state, [carta("copas", 8), carta("ouros", 8)]).total, (10 + 16) * (2 + 2));
+  igual(pontuarJogada(state, [carta("copas", 13), carta("ouros", 13)]).total, 30 * 2);
+});
+
+teste("scoring: corrida acumula +15 chips por Sequência", () => {
+  const c = novoCoringa("corrida");
+  const state = stateBase({ coringas: [c] });
+  const seq = () => [
+    carta("copas", 5), carta("ouros", 6), carta("paus", 7),
+    carta("espadas", 8), carta("copas", 9),
+  ];
+  igual(pontuarJogada(state, seq()).total, 80 * 4);
+  igual(pontuarJogada(state, seq()).total, 95 * 4);
+});
+
+teste("scoring: castelo-cartas acumula +4 chips por jogada de 4 cartas", () => {
+  const c = novoCoringa("castelo-cartas");
+  const state = stateBase({ coringas: [c] });
+  const cartas4 = () => [carta("copas", 9), carta("ouros", 9), carta("paus", 7), carta("espadas", 7)];
+  igual(pontuarJogada(state, cartas4()).total, 56 * 2);
+  igual(pontuarJogada(state, cartas4()).total, 60 * 2);
+});
+
+teste("scoring: campeao ganha ×0,1 por Quadra", () => {
+  const c = novoCoringa("campeao");
+  const state = stateBase({ coringas: [c] });
+  const quadra = () => [
+    carta("copas", 9), carta("ouros", 9), carta("paus", 9), carta("espadas", 9),
+  ];
+  igual(pontuarJogada(state, quadra()).total, Math.floor(96 * (7 * 1.1)));
+  igual(pontuarJogada(state, quadra()).total, Math.floor(96 * (7 * 1.2)));
+});
+
+teste("scoring: misterioso retorna mult entre 0 e 23", () => {
+  let viu = false;
+  for (let seed = 1; seed <= 30; seed++) {
+    const state = stateBase({ coringas: [novoCoringa("misterioso")], rngEstado: seed });
+    const { eventos } = pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]);
+    const ef = eventos.find((e) => e.tipo === "efeito" && e.origem === "misterioso");
+    // mult 0 é suprimido pelo pipeline (não vira efeito); quando há efeito, está em [1,23]
+    if (ef) { ok(ef.mult >= 1 && ef.mult <= 23, `mult fora do intervalo: ${ef.mult}`); viu = true; }
+  }
+  ok(viu, "nenhum seed produziu efeito — entre() pode estar quebrada");
+});

@@ -187,5 +187,16 @@ teste("run: usarConsumivel (taro/espectral) — sucesso gasta, erro reinsere", (
   igual(state.consumiveis, [{ tipo: "espectral", id: "seance" }], "erro mantém o slot");
 });
 
+teste("run: coringa-ouro paga $4 ao fim da rodada", () => {
+  const state = emRodada();
+  state.blindAtual.alvo = 10;
+  state.dinheiro = 0;
+  state.coringas = [novoCoringa("coringa-ouro")];
+  prepararMao(state, [carta("copas", 9), carta("ouros", 9)]);
+  jogar(state, [0, 1]);
+  // $3 (pequena) + $3 (mãos restantes) + $0 juros + $4 do coringa-ouro = 10
+  igual(state.dinheiro, 10);
+});
+
 // limpeza: testes acima gravam save indireto? (jogar/iniciar não salvam — só a UI salva)
 apagarSave();

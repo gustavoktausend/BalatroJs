@@ -107,6 +107,27 @@ lateral; chefe em vermelho.
 
 Testes após a iconografia: `node tests/todos.js` → **113 teste(s), 0 falha(s)**.
 
+## Mais coringas (lote P1) — CONCLUÍDA (2026-06-15)
+
+Primeiro item 🎯 do backlog da auditoria de paridade (`2026-06-15-auditoria-paridade-balatro.md`).
+Frente em `feature/mais-coringas` (spec `docs/superpowers/specs/2026-06-15-mais-coringas-design.md`,
+plano `docs/superpowers/plans/2026-06-15-mais-coringas.md`). Workflow subagent-driven
+(implementador haiku → revisor spec sonnet → revisor qualidade sonnet → revisão final
+opus). Merge `--no-ff` em `main`, branch apagada, push.
+
+- **Coringas: 25 → 49** (alvo inicial era 50/+25; um duplicado — `cara-sorridente`,
+  igual ao `cara-amigavel` existente — foi removido na revisão, fechando em +24/49).
+  Distribuição final **27 comuns / 16 incomuns / 6 raros**.
+- Só ganchos/efeitos do motor (`aoPontuarCarta/Mao/FimDaRodada`, chips/mult/xmult/
+  dinheiro). **Zero mudança no engine**, sem bump de `VERSAO_SAVE`.
+- 5 tasks TDD. Achados de revisão corrigidos: `steven-par`/`todd-impar` não disparam
+  em figuras (paridade só numérica, como no Balatro); comentários de intenção
+  (flush não herda sequência-de-naipe; `estencil` literal 5; paralelos intencionais;
+  RNG do `misterioso` na pontuação). Único arquivo de produção tocado além de uma
+  linha de comentário em `hands.js`: `js/data/jokers.js`.
+
+Testes após o lote: `node tests/todos.js` → **134 teste(s), 0 falha(s)**.
+
 ## Convenções (não esquecer nos prompts dos subagentes)
 
 - Código/comentários em português; zero dependências; ES modules sem build.
