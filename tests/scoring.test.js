@@ -207,3 +207,48 @@ teste("scoring: abstrato soma por coringa possuído", () => {
   const state = stateBase({ coringas: [novoCoringa("abstrato"), novoCoringa("coringa")] });
   igual(pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]).total, 28 * 12);
 });
+
+teste("scoring: cartao-fidelidade dá ×4 a cada 6 mãos", () => {
+  const c = novoCoringa("cartao-fidelidade");
+  const state = stateBase({ coringas: [c] });
+  const jogar = () => pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]).total;
+  for (let i = 0; i < 5; i++) igual(jogar(), 28 * 2, `mão ${i + 1} sem bônus`);
+  igual(jogar(), 28 * 2 * 4, "6ª mão ativa ×4");
+});
+
+teste("scoring: bode acumula sem figura e zera com figura", () => {
+  const c = novoCoringa("bode");
+  const state = stateBase({ coringas: [c] });
+  igual(pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]).total, 28 * (2 + 1));
+  igual(pontuarJogada(state, [carta("copas", 8), carta("ouros", 8)]).total, (10 + 16) * (2 + 2));
+  igual(pontuarJogada(state, [carta("copas", 13), carta("ouros", 13)]).total, 30 * 2);
+});
+
+teste("scoring: corrida acumula +15 chips por Sequência", () => {
+  const c = novoCoringa("corrida");
+  const state = stateBase({ coringas: [c] });
+  const seq = () => [
+    carta("copas", 5), carta("ouros", 6), carta("paus", 7),
+    carta("espadas", 8), carta("copas", 9),
+  ];
+  igual(pontuarJogada(state, seq()).total, 80 * 4);
+  igual(pontuarJogada(state, seq()).total, 95 * 4);
+});
+
+teste("scoring: castelo-cartas acumula +4 chips por jogada de 4 cartas", () => {
+  const c = novoCoringa("castelo-cartas");
+  const state = stateBase({ coringas: [c] });
+  const cartas4 = () => [carta("copas", 9), carta("ouros", 9), carta("paus", 7), carta("espadas", 7)];
+  igual(pontuarJogada(state, cartas4()).total, 56 * 2);
+  igual(pontuarJogada(state, cartas4()).total, 60 * 2);
+});
+
+teste("scoring: campeao ganha ×0,1 por Quadra", () => {
+  const c = novoCoringa("campeao");
+  const state = stateBase({ coringas: [c] });
+  const quadra = () => [
+    carta("copas", 9), carta("ouros", 9), carta("paus", 9), carta("espadas", 9),
+  ];
+  igual(pontuarJogada(state, quadra()).total, Math.floor(96 * 7.7));
+  igual(pontuarJogada(state, quadra()).total, Math.floor(96 * (7 * 1.2)));
+});

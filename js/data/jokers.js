@@ -167,6 +167,44 @@ const LISTA = [
   { id: "abstrato", nome: "Coringa Abstrato", raridade: "incomum", preco: 6,
     descricao: "+3 mult por Coringa que você possui",
     ganchos: { aoPontuarMao: (ctx) => ({ mult: 3 * ctx.state.coringas.length }) } },
+  { id: "cartao-fidelidade", nome: "Cartão Fidelidade", raridade: "incomum", preco: 7,
+    descricao: "×4 mult a cada 6 mãos jogadas (na 6ª, 12ª, ...)",
+    estadoInicial: { contagem: 0 },
+    ganchos: {
+      aoPontuarMao: (ctx) => {
+        ctx.coringa.dados.contagem += 1;
+        return ctx.coringa.dados.contagem % 6 === 0 ? { xmult: 4 } : null;
+      },
+    } },
+  { id: "bode", nome: "Bode Expiatório", raridade: "incomum", preco: 6,
+    descricao: "+1 mult acumulado por mão sem figura; zera ao jogar uma figura",
+    estadoInicial: { mult: 0 },
+    ganchos: {
+      aoPontuarMao: (ctx) => {
+        const dados = ctx.coringa.dados;
+        if (ctx.jogada.cartas.some(ehFigura)) { dados.mult = 0; return null; }
+        dados.mult += 1;
+        return { mult: dados.mult };
+      },
+    } },
+  { id: "corrida", nome: "Corrida", raridade: "incomum", preco: 7,
+    descricao: "+15 chips acumulados a cada Sequência jogada",
+    estadoInicial: { chips: 0 },
+    ganchos: {
+      aoPontuarMao: (ctx) => {
+        if (maoContem(ctx.jogada.tipo, "sequencia")) ctx.coringa.dados.chips += 15;
+        return { chips: ctx.coringa.dados.chips };
+      },
+    } },
+  { id: "castelo-cartas", nome: "Castelo de Cartas", raridade: "incomum", preco: 6,
+    descricao: "+4 chips acumulados sempre que a jogada tem exatamente 4 cartas",
+    estadoInicial: { chips: 0 },
+    ganchos: {
+      aoPontuarMao: (ctx) => {
+        if (ctx.jogada.cartas.length === 4) ctx.coringa.dados.chips += 4;
+        return { chips: ctx.coringa.dados.chips };
+      },
+    } },
 
   // ── Raros (3) ────────────────────────────────────────────────
   { id: "cavendish", nome: "Cavendish", raridade: "raro", preco: 8,
@@ -196,6 +234,15 @@ const LISTA = [
   { id: "coturno", nome: "Coturno", raridade: "raro", preco: 8,
     descricao: "+2 mult por cada $5 que você possui",
     ganchos: { aoPontuarMao: (ctx) => ({ mult: 2 * Math.floor(ctx.state.dinheiro / 5) }) } },
+  { id: "campeao", nome: "Campeão", raridade: "raro", preco: 9,
+    descricao: "×mult; ganha +0,1 a cada Quadra jogada",
+    estadoInicial: { x: 1 },
+    ganchos: {
+      aoPontuarMao: (ctx) => {
+        if (ctx.jogada.tipo === "quadra") ctx.coringa.dados.x = +(ctx.coringa.dados.x + 0.1).toFixed(1);
+        return { xmult: ctx.coringa.dados.x };
+      },
+    } },
 ];
 
 export const CORINGAS = Object.fromEntries(LISTA.map((c) => [c.id, c]));
