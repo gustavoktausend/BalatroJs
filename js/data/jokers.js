@@ -22,7 +22,7 @@ function ehPar(carta) {
 }
 
 const LISTA = [
-  // ── Comuns (14) ──────────────────────────────────────────────
+  // ── Comuns (27) ──────────────────────────────────────────────
   { id: "coringa", nome: "Coringa", raridade: "comum", preco: 3,
     descricao: "+4 mult",
     ganchos: { aoPontuarMao: () => ({ mult: 4 }) } },
@@ -107,7 +107,7 @@ const LISTA = [
     descricao: "×3 mult na última mão da rodada",
     ganchos: { aoPontuarMao: (ctx) => (ctx.state.rodada.maosRestantes === 1 ? { xmult: 3 } : null) } },
 
-  // ── Incomuns (8) ─────────────────────────────────────────────
+  // ── Incomuns (16) ────────────────────────────────────────────
   { id: "coringa-verde", nome: "Coringa Verde", raridade: "incomum", preco: 6,
     descricao: "+1 mult por mão jogada; −1 mult por descarte usado",
     estadoInicial: { mult: 0 },
@@ -211,7 +211,7 @@ const LISTA = [
     // entre() ficam em aoFimDaRodada). A ordem dos coringas afeta o fluxo de RNG da mão.
     ganchos: { aoPontuarMao: (ctx) => ({ mult: entre(ctx.state, 0, 23) }) } },
 
-  // ── Raros (3) ────────────────────────────────────────────────
+  // ── Raros (6) ────────────────────────────────────────────────
   { id: "cavendish", nome: "Cavendish", raridade: "raro", preco: 8,
     descricao: "×3 mult; chance de 1 em 12 de se destruir ao fim da rodada",
     ganchos: {
