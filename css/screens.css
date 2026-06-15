@@ -108,6 +108,13 @@
   position: relative;
   flex-wrap: wrap;
 }
+#area-jogada {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
 .placar-jogada {
   width: 100%;
   text-align: center;
