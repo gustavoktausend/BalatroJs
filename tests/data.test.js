@@ -72,7 +72,7 @@ teste("consumiveis: todo planeta/tarô/espectral tem ícone (glifo não vazio)",
   const grupos = { planeta: PLANETAS, taro: TAROS, espectral: ESPECTRAIS };
   for (const [tipo, mapa] of Object.entries(grupos)) {
     for (const def of Object.values(mapa)) {
-      ok(typeof def.icone === "string" && def.icone.length > 0,
+      ok(typeof def.icone === "string" && def.icone.trim().length > 0,
         `${tipo} sem ícone: ${def.nome}`);
     }
   }
