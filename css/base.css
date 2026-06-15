@@ -108,3 +108,11 @@ button { font: inherit; cursor: pointer; }
   z-index: -1;
   pointer-events: none;
 }
+
+/* ── Responsivo ───────────────────────────────── */
+@media (max-width: 600px) {
+  .painel-baralho { width: 90vw; padding: 1rem; font-size: 0.95rem; }
+  #tooltip { max-width: 200px; font-size: 0.8rem; }
+  #aviso { max-width: 90vw; font-size: 0.95rem; padding: 0.5rem 0.9rem; }
+  .botao-mini { padding: 0.3rem 0.6rem; }
+}

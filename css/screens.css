@@ -160,3 +160,41 @@
 
 .seletor-run { cursor: pointer; }
 .rotulo-seletor { display: block; margin: 0.6rem 0 0.2rem; font-weight: 600; }
+
+/* ── Responsivo ───────────────────────────────── */
+@media (max-width: 900px) {
+  [data-tela="rodada"] { grid-template-columns: 240px 1fr; gap: 0.9rem; }
+  .blinds { flex-wrap: wrap; justify-content: center; }
+  .itens-loja { flex-wrap: wrap; justify-content: center; }
+  .cabecalho-run { flex-wrap: wrap; justify-content: center; gap: 1rem; font-size: 1rem; }
+}
+
+@media (max-width: 600px) {
+  [data-tela] { padding: 0.7rem; }
+
+  /* Rodada: coluna única — .lateral (1º filho) sobe ao topo */
+  [data-tela="rodada"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .lateral {
+    align-self: stretch;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 0.7rem;
+  }
+  .painel-blind, .painel-pontuacao { flex: 1 1 45%; padding: 0.5rem; }
+  #previa-mao { flex: 1 1 100%; min-height: 2rem; font-size: 0.95rem; }
+
+  .mesa { min-height: auto; gap: 0.7rem; }
+  .centro { min-height: 120px; }
+  .topo { gap: 0.5rem; }
+
+  /* Demais telas empilham */
+  .cartao-blind { width: 100%; max-width: 320px; }
+  .logo { font-size: 1.8rem; }
+  .cabecalho-run { font-size: 0.9rem; gap: 0.7rem; }
+  .tabela-maos { min-width: auto; width: 100%; }
+}
