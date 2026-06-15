@@ -80,6 +80,33 @@ verso 60×84. Screenshots conferidos.
 
 Testes após a Etapa 2: `node tests/todos.js` → **112 teste(s), 0 falha(s)**.
 
+## Iconografia de blinds e consumíveis — CONCLUÍDA (2026-06-15)
+
+Frente executada em `feature/iconografia` (plano
+`docs/superpowers/plans/2026-06-15-iconografia-blinds-consumiveis.md`, spec
+`docs/superpowers/specs/2026-06-15-iconografia-blinds-consumiveis-design.md`).
+Workflow subagent-driven (implementador haiku → spec sonnet → qualidade sonnet →
+final opus). Merge `--no-ff` em `main`, branch apagada, push.
+
+- [x] Task 1 (TDD) — campo `icone` (glifo Unicode) em 9 planetas, 6 tarôs, 3
+  espectrais (`js/data/*.js`); teste em `data.test.js` garante glifo não-vazio
+  (`.trim().length > 0`). Suíte 112 → 113.
+- [x] Task 2 — glifo central na caixa do consumível (`elementoConsumivel`); CSS
+  layout coluna (espelha o coringa) + cor por tipo. Fix: glifo escala nos
+  breakpoints (2.6 / 2.1 / 1.6rem) para não vazar a 56×74 no mobile.
+- [x] Task 3 — `ICONE_BLIND = { pequena:"●", grande:"◆", chefe:"☠" }` antes do nome
+  na seleção (`cartaoBlind`) e na lateral (`painelLateral`); CSS `.icone-blind`;
+  chefe herda vermelho do `<h3>`.
+
+Glifos: planetas ♇☿♅♀♄♃⊕♂♆ · tarôs ✷★☾⛧☸⚖ · espectrais ✦❂☄ · blinds ●◆☠.
+
+**Validação visual no navegador (chrome-devtools):** teste de fingerprint de pixels
+confirmou os 21 glifos renderizando sem tofu (□) na fonte Rubik; cores por tipo
+corretas; ⊕ (pior caso) cabe na caixa 56×74 mobile com folga; blinds na seleção e na
+lateral; chefe em vermelho.
+
+Testes após a iconografia: `node tests/todos.js` → **113 teste(s), 0 falha(s)**.
+
 ## Convenções (não esquecer nos prompts dos subagentes)
 
 - Código/comentários em português; zero dependências; ES modules sem build.
