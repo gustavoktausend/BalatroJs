@@ -190,7 +190,8 @@
 
   .mesa { min-height: auto; gap: 0.7rem; }
   .centro { min-height: 120px; }
-  .topo { gap: 0.5rem; }
+  .topo { gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+  .coringas, .consumiveis { flex-wrap: wrap; justify-content: center; }
 
   /* Demais telas empilham */
   .cartao-blind { width: 100%; max-width: 320px; }
