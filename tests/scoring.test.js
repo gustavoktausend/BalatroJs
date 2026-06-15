@@ -252,3 +252,13 @@ teste("scoring: campeao ganha ×0,1 por Quadra", () => {
   igual(pontuarJogada(state, quadra()).total, Math.floor(96 * (7 * 1.1)));
   igual(pontuarJogada(state, quadra()).total, Math.floor(96 * (7 * 1.2)));
 });
+
+teste("scoring: misterioso retorna mult entre 0 e 23", () => {
+  for (let seed = 1; seed <= 30; seed++) {
+    const state = stateBase({ coringas: [novoCoringa("misterioso")], rngEstado: seed });
+    const { eventos } = pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]);
+    const ef = eventos.find((e) => e.tipo === "efeito" && e.origem === "misterioso");
+    // mult 0 é suprimido pelo pipeline (não vira efeito); quando há efeito, está em [1,23]
+    if (ef) ok(ef.mult >= 1 && ef.mult <= 23, `mult fora do intervalo: ${ef.mult}`);
+  }
+});

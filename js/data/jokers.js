@@ -205,6 +205,9 @@ const LISTA = [
         return { chips: ctx.coringa.dados.chips };
       },
     } },
+  { id: "misterioso", nome: "Coringa Misterioso", raridade: "incomum", preco: 6,
+    descricao: "+mult aleatório de 0 a 23 a cada mão jogada",
+    ganchos: { aoPontuarMao: (ctx) => ({ mult: entre(ctx.state, 0, 23) }) } },
 
   // ── Raros (3) ────────────────────────────────────────────────
   { id: "cavendish", nome: "Cavendish", raridade: "raro", preco: 8,
@@ -243,6 +246,9 @@ const LISTA = [
         return { xmult: ctx.coringa.dados.x };
       },
     } },
+  { id: "coringa-ouro", nome: "Coringa de Ouro", raridade: "raro", preco: 8,
+    descricao: "Dá $4 ao fim de cada rodada",
+    ganchos: { aoFimDaRodada: () => ({ dinheiro: 4 }) } },
 ];
 
 export const CORINGAS = Object.fromEntries(LISTA.map((c) => [c.id, c]));
