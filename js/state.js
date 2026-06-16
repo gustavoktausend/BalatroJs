@@ -3,8 +3,9 @@ import { MAOS } from "./data/hands.js";
 import { CORINGAS } from "./data/jokers.js";
 import { BARALHOS } from "./data/baralhos.js";
 import { STAKES } from "./data/stakes.js";
+import { criarBaralho } from "./engine/deck.js";
 
-export const VERSAO_SAVE = 4;
+export const VERSAO_SAVE = 5;
 const CHAVE_SAVE = "balatrojs-save";
 
 export function criarRun(semente = Date.now() % 2 ** 31, baralhoId = "padrao", stakeId = "branco") {
@@ -24,6 +25,7 @@ export function criarRun(semente = Date.now() % 2 ** 31, baralhoId = "padrao", s
     consumiveis: [],  // { tipo: "planeta"|"taro"|"espectral", id } — máx. 2
     vouchers: [],     // ids de vouchers possuídos (permanentes)
     baralho: baralho.id,
+    baralhoRun: criarBaralho(),
     stake: stake.id,
     niveisMaos: Object.fromEntries(Object.keys(MAOS).map((m) => [m, 1])),
     estatisticas: { porMao: {}, melhorJogada: 0, rodadas: 0 },

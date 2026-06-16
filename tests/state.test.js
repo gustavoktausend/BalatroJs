@@ -1,5 +1,5 @@
 import { teste, ok, igual } from "./harness.js";
-import { criarRun, salvar, carregar, apagarSave } from "../js/state.js";
+import { criarRun, salvar, carregar, apagarSave, VERSAO_SAVE } from "../js/state.js";
 import { novoCoringa } from "../js/data/jokers.js";
 
 teste("state: criarRun monta o estado inicial do spec", () => {
@@ -43,5 +43,29 @@ teste("state: save de versão diferente ou corrompido vira null", () => {
   igual(carregar(), null, "json inválido");
   localStorage.setItem("balatrojs-save", JSON.stringify({ versao: 999, coringas: [] }));
   igual(carregar(), null, "versão desconhecida");
+  apagarSave();
+});
+
+teste("state: criarRun cria baralhoRun de 52 cartas com aprimoramento null", () => {
+  const s = criarRun(123);
+  ok(Array.isArray(s.baralhoRun) && s.baralhoRun.length === 52, "baralhoRun deve ter 52 cartas");
+  ok(s.baralhoRun.every((c) => c.aprimoramento === null));
+});
+
+teste("state: VERSAO_SAVE é 5", () => {
+  igual(VERSAO_SAVE, 5);
+});
+
+teste("state: salvar/carregar preserva os aprimoramentos do baralhoRun", () => {
+  apagarSave();
+  const state = criarRun(7);
+  state.baralhoRun[0].aprimoramento = "vidro";
+  state.baralhoRun[10].aprimoramento = "ouro";
+  salvar(state);
+
+  const carregado = carregar();
+  igual(carregado.baralhoRun.length, 52);
+  igual(carregado.baralhoRun[0].aprimoramento, "vidro");
+  igual(carregado.baralhoRun[10].aprimoramento, "ouro");
   apagarSave();
 });

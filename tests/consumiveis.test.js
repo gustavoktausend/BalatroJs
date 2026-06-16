@@ -3,6 +3,7 @@ import { criarRun } from "../js/state.js";
 import { TAROS } from "../js/data/taros.js";
 import { ESPECTRAIS } from "../js/data/espectrais.js";
 import { novoCoringa } from "../js/data/jokers.js";
+import { iniciarBlind } from "../js/engine/run.js";
 
 teste("taros: O Mundo dá +$20", () => {
   const state = criarRun(1);
@@ -53,6 +54,25 @@ teste("taros: A Temperança paga venda dos coringas (teto 20)", () => {
   igual(TAROS["a-temperanca"].aplicar(state), {});
   ok(state.dinheiro > antes, "soma valor de venda");
   ok(state.dinheiro - antes <= 20, "teto de 20");
+});
+
+teste("taro O Mago: aplica Mult a até 2 cartas do baralhoRun (sem rodada)", () => {
+  const s = criarRun(123);
+  s.rodada = null;
+  const r = TAROS["o-mago"].aplicar(s);
+  ok(!r.erro, "não deve falhar");
+  const comMult = s.baralhoRun.filter((c) => c.aprimoramento === "mult").length;
+  igual(comMult, 2, "duas cartas do baralhoRun viram Mult");
+});
+
+teste("taro O Mago: com rodada ativa, aplica nas cartas da mão e persiste no baralhoRun", () => {
+  const s = criarRun(123);
+  iniciarBlind(s, "pequena");
+  const alvo = s.rodada.mao[0];
+  TAROS["o-mago"].aplicar(s);
+  igual(s.rodada.mao[0].aprimoramento, "mult", "a 1ª carta da mão vira Mult");
+  const noMestre = s.baralhoRun.find((c) => c.id === alvo.id);
+  ok(noMestre && noMestre.aprimoramento === "mult", "o aprimoramento persiste no baralhoRun");
 });
 
 teste("espectrais: Aether sobe 2 níveis", () => {

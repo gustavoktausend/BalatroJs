@@ -1,4 +1,4 @@
-import { criarBaralho } from "./deck.js";
+import { copiarBaralho } from "./deck.js";
 import { embaralhar } from "./rng.js";
 import { detectarMao } from "./poker.js";
 import { pontuarJogada, chefeAtivo } from "./scoring.js";
@@ -22,7 +22,7 @@ export function iniciarBlind(state, tipo) {
   const multStake = (STAKES[state.stake] || STAKES.branco).multAlvo;
   state.blindAtual = { tipo, chefeId, alvo: alvoDaBlind(state.ante, tipo, chefeId, multStake) };
   state.rodada = {
-    baralho: embaralhar(state, criarBaralho()),
+    baralho: embaralhar(state, copiarBaralho(state.baralhoRun)),
     mao: [],
     pontuacao: 0,
     maosRestantes: MAOS_POR_BLIND + (state.vouchers.includes("maos-mais") ? 1 : 0) + baralho.maosBonus,
@@ -81,9 +81,14 @@ export function jogar(state, indices) {
   // tiposJogados só recebe o tipo depois, para Trapaceiro/Boca verem o passado.
   const tipo = detectarMao(cartas).tipo;
   state.estatisticas.porMao[tipo] = (state.estatisticas.porMao[tipo] || 0) + 1;
-  const { total, eventos } = pontuarJogada(state, cartas);
+  const { total, eventos, cartasDestruidas, dinheiroSorte } = pontuarJogada(state, cartas);
 
   rodada.pontuacao += total;
+  if (dinheiroSorte) state.dinheiro += dinheiroSorte;
+  if (cartasDestruidas?.length) {
+    const ids = new Set(cartasDestruidas.map((c) => c.id));
+    state.baralhoRun = state.baralhoRun.filter((c) => !ids.has(c.id));
+  }
   rodada.maosRestantes -= 1;
   rodada.tiposJogados.push(tipo);
   state.ultimaMaoJogada = tipo;
@@ -119,6 +124,10 @@ function vencerBlind(state, eventos) {
     state.coringas.splice(state.coringas.indexOf(coringa), 1);
     eventos.push({ tipo: "coringa-destruido", id: coringa.id, nome: coringa.def.nome });
   }
+
+  // Ouro: +$3 por carta de ouro que sobrou na mão ao vencer a blind.
+  const ouroNaMao = state.rodada.mao.filter((c) => c.aprimoramento === "ouro").length;
+  if (ouroNaMao) dinheiroExtra += 3 * ouroNaMao;
 
   const tetoJuros = state.vouchers.includes("juros-mais") ? 10 : 5;
   const recompensa = recompensaBlind(tipo, state.rodada.maosRestantes, state.dinheiro, tetoJuros) + dinheiroExtra;

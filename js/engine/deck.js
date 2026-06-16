@@ -8,7 +8,7 @@ export function criarBaralho() {
   const baralho = [];
   for (const naipe of NAIPES) {
     for (let valor = 2; valor <= 14; valor++) {
-      baralho.push({ id: `${naipe}-${valor}`, naipe, valor });
+      baralho.push({ id: `${naipe}-${valor}`, naipe, valor, aprimoramento: null });
     }
   }
   return baralho;
@@ -28,4 +28,14 @@ export function rotuloDaCarta(carta) {
 
 export function ehFigura(carta) {
   return carta.valor >= 11 && carta.valor <= 13;
+}
+
+// Cópia rasa por carta — usada para tirar o baralho da rodada do baralho-mestre
+// da run sem que mutações da rodada (ex.: ordenação) vazem para o mestre.
+export function copiarBaralho(baralho) {
+  return baralho.map((c) => ({ ...c }));
+}
+
+export function ehPedra(carta) {
+  return carta.aprimoramento === "pedra";
 }

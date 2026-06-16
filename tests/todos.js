@@ -14,6 +14,7 @@ import "./vouchers.test.js";
 import "./consumiveis.test.js";
 import "./fundo.test.js";
 import "./seed.test.js";
+import "./aprimoramentos.test.js";
 
 // Os arquivos *.test.js são adicionados aqui conforme as tarefas avançam.
 

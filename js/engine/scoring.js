@@ -1,11 +1,23 @@
 import { detectarMao } from "./poker.js";
 import { MAOS, valoresDaMao } from "../data/hands.js";
-import { chipsDaCarta } from "./deck.js";
+import { chipsDaCarta, ehPedra } from "./deck.js";
 import { CHEFES } from "../data/bosses.js";
+import { entre } from "./rng.js";
 
 export function chefeAtivo(state) {
   const blind = state.blindAtual;
   return blind && blind.tipo === "chefe" ? CHEFES[blind.chefeId] : null;
+}
+
+// Efeitos de aprimoramento aplicados quando a CARTA pontua. bonus/mult/pedra são
+// determinísticos; vidro e sorte (com RNG) são tratados à parte no loop principal.
+function efeitoAprimoramentoNaCarta(carta) {
+  switch (carta.aprimoramento) {
+    case "bonus": return { chips: 30 };
+    case "mult":  return { mult: 4 };
+    case "pedra": return { chips: 50 };
+    default:      return null;
+  }
 }
 
 // Pontua uma jogada e devolve { total, eventos, jogada }.
@@ -17,6 +29,8 @@ export function pontuarJogada(state, cartas) {
 
   let { chips, mult } = valoresDaMao(jogada.tipo, state.niveisMaos[jogada.tipo]);
   const eventos = [{ tipo: "mao", mao: jogada.tipo, nome: MAOS[jogada.tipo].nome, chips, mult }];
+  const cartasDestruidas = [];
+  let dinheiroSorte = 0;
   const ctx = { state, jogada, memoria: {} };
 
   const aplicar = (efeito, origem) => {
@@ -33,10 +47,39 @@ export function pontuarJogada(state, cartas) {
       eventos.push({ tipo: "carta-debuffada", carta });
       continue;
     }
-    chips += chipsDaCarta(carta);
-    eventos.push({ tipo: "carta", carta, chips: chipsDaCarta(carta), chipsTotal: chips });
+    if (!ehPedra(carta)) {
+      chips += chipsDaCarta(carta);
+      eventos.push({ tipo: "carta", carta, chips: chipsDaCarta(carta), chipsTotal: chips });
+    } else {
+      eventos.push({ tipo: "carta", carta, chips: 0, chipsTotal: chips });
+    }
+    aplicar(efeitoAprimoramentoNaCarta(carta), `aprimoramento:${carta.aprimoramento}`);
+    // Vidro consome RNG da run durante a pontuação (mesmo padrão do Coringa
+    // Misterioso) — a ORDEM das cartas na jogada afeta o fluxo do RNG.
+    if (carta.aprimoramento === "vidro") {
+      aplicar({ xmult: 2 }, "aprimoramento:vidro");
+      if (entre(state, 1, 4) === 1) {
+        cartasDestruidas.push(carta);
+        eventos.push({ tipo: "carta-destruida", carta });
+      }
+    }
+    // Sorte consome RNG da run durante a pontuação: duas rolagens independentes,
+    // nesta ordem (mult 1/5 antes do dinheiro 1/15) — não muda se afetar o RNG.
+    if (carta.aprimoramento === "sorte") {
+      if (entre(state, 1, 5) === 1) aplicar({ mult: 20 }, "aprimoramento:sorte");
+      if (entre(state, 1, 15) === 1) dinheiroSorte += 20;
+    }
     for (const coringa of state.coringas) {
       aplicar(coringa.def.ganchos.aoPontuarCarta?.(carta, { ...ctx, coringa }), coringa.id);
+    }
+  }
+
+  // Aço: ×1,5 mult por carta de aço SEGURADA na mão — só conta as que NÃO foram
+  // jogadas (a mão ainda contém as jogadas neste ponto; elas pontuam como carta normal).
+  const mao = state.rodada?.mao ?? [];
+  for (const cartaMao of mao) {
+    if (cartaMao.aprimoramento === "aco" && !cartas.includes(cartaMao)) {
+      aplicar({ xmult: 1.5 }, "aprimoramento:aco");
     }
   }
 
@@ -46,5 +89,5 @@ export function pontuarJogada(state, cartas) {
 
   const total = Math.floor(chips * mult);
   eventos.push({ tipo: "total", total, chips, mult });
-  return { total, eventos, jogada };
+  return { total, eventos, jogada, cartasDestruidas, dinheiroSorte };
 }
