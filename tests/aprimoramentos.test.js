@@ -64,6 +64,17 @@ teste("aprimoramento aco: duas cartas de aço na mão multiplicam duas vezes", (
   igual(total, Math.floor(28 * (2 * 1.5 * 1.5)));
 });
 
+teste("aprimoramento aco: carta de aço JOGADA não dá ×1,5 (só segurada conta)", () => {
+  // No momento da pontuação, state.rodada.mao ainda contém as cartas jogadas
+  // (só são filtradas depois, em run.js). O aço só vale para cartas SEGURADAS,
+  // então uma carta de aço que está sendo pontuada não deve multiplicar.
+  const jogadas = [carta("copas", 9, "aco"), carta("ouros", 9)];
+  const naMao = [...jogadas, carta("espadas", 3)]; // a carta de aço também está na mão
+  const state = stateBase({ rodada: { ...stateBase().rodada, mao: naMao } });
+  const { total } = pontuarJogada(state, jogadas);
+  igual(total, 28 * 2, "aço jogado pontua como carta normal (sem ×1,5)");
+});
+
 teste("aprimoramento vidro: ×2 mult sempre que pontua", () => {
   const state = stateBase({ rngEstado: 1 });
   const { total } = pontuarJogada(state, [carta("copas", 9, "vidro"), carta("ouros", 9)]);

@@ -74,10 +74,13 @@ export function pontuarJogada(state, cartas) {
     }
   }
 
-  // Aço: ×1,5 mult por carta de aço SEGURADA na mão (não precisa ser jogada).
+  // Aço: ×1,5 mult por carta de aço SEGURADA na mão — só conta as que NÃO foram
+  // jogadas (a mão ainda contém as jogadas neste ponto; elas pontuam como carta normal).
   const mao = state.rodada?.mao ?? [];
   for (const cartaMao of mao) {
-    if (cartaMao.aprimoramento === "aco") aplicar({ xmult: 1.5 }, "aprimoramento:aco");
+    if (cartaMao.aprimoramento === "aco" && !cartas.includes(cartaMao)) {
+      aplicar({ xmult: 1.5 }, "aprimoramento:aco");
+    }
   }
 
   for (const coringa of state.coringas) {

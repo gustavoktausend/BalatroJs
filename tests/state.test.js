@@ -55,3 +55,17 @@ teste("state: criarRun cria baralhoRun de 52 cartas com aprimoramento null", () 
 teste("state: VERSAO_SAVE é 5", () => {
   igual(VERSAO_SAVE, 5);
 });
+
+teste("state: salvar/carregar preserva os aprimoramentos do baralhoRun", () => {
+  apagarSave();
+  const state = criarRun(7);
+  state.baralhoRun[0].aprimoramento = "vidro";
+  state.baralhoRun[10].aprimoramento = "ouro";
+  salvar(state);
+
+  const carregado = carregar();
+  igual(carregado.baralhoRun.length, 52);
+  igual(carregado.baralhoRun[0].aprimoramento, "vidro");
+  igual(carregado.baralhoRun[10].aprimoramento, "ouro");
+  apagarSave();
+});
