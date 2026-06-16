@@ -1,11 +1,22 @@
 import { detectarMao } from "./poker.js";
 import { MAOS, valoresDaMao } from "../data/hands.js";
-import { chipsDaCarta } from "./deck.js";
+import { chipsDaCarta, ehPedra } from "./deck.js";
 import { CHEFES } from "../data/bosses.js";
 
 export function chefeAtivo(state) {
   const blind = state.blindAtual;
   return blind && blind.tipo === "chefe" ? CHEFES[blind.chefeId] : null;
+}
+
+// Efeitos de aprimoramento aplicados quando a CARTA pontua. bonus/mult/pedra são
+// determinísticos; vidro e sorte (com RNG) são tratados à parte no loop principal.
+function efeitoAprimoramentoNaCarta(carta) {
+  switch (carta.aprimoramento) {
+    case "bonus": return { chips: 30 };
+    case "mult":  return { mult: 4 };
+    case "pedra": return { chips: 50 };
+    default:      return null;
+  }
 }
 
 // Pontua uma jogada e devolve { total, eventos, jogada }.
@@ -33,8 +44,13 @@ export function pontuarJogada(state, cartas) {
       eventos.push({ tipo: "carta-debuffada", carta });
       continue;
     }
-    chips += chipsDaCarta(carta);
-    eventos.push({ tipo: "carta", carta, chips: chipsDaCarta(carta), chipsTotal: chips });
+    if (!ehPedra(carta)) {
+      chips += chipsDaCarta(carta);
+      eventos.push({ tipo: "carta", carta, chips: chipsDaCarta(carta), chipsTotal: chips });
+    } else {
+      eventos.push({ tipo: "carta", carta, chips: 0, chipsTotal: chips });
+    }
+    aplicar(efeitoAprimoramentoNaCarta(carta), `aprimoramento:${carta.aprimoramento}`);
     for (const coringa of state.coringas) {
       aplicar(coringa.def.ganchos.aoPontuarCarta?.(carta, { ...ctx, coringa }), coringa.id);
     }
