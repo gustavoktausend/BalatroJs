@@ -21,7 +21,7 @@ function detectarEntreJogaveis(cartas) {
     .map(([valor, qtd]) => ({ valor, qtd }))
     .sort((a, b) => b.qtd - a.qtd || b.valor - a.valor);
 
-  const flush = cartas.length === 5 && cartas.every((c) => c.naipe === cartas[0].naipe);
+  const flush = cartas.length === 5 && ehFlush(cartas);
   const sequencia = ehSequencia(cartas);
   const dosGrupos = (n) => {
     const valores = new Set(grupos.slice(0, n).map((g) => g.valor));
@@ -41,6 +41,16 @@ function detectarEntreJogaveis(cartas) {
 
   const maisAlta = [...cartas].sort((a, b) => b.valor - a.valor)[0];
   return { tipo: "carta-alta", real: false, cartasQuePontuam: [maisAlta] };
+}
+
+// Flush considerando wild como naipe coringa: existe um naipe tal que toda carta
+// é desse naipe OU é wild. Wild NÃO altera rank (grupos/sequência por valor).
+function ehFlush(cartas) {
+  const ehWild = (c) => c.aprimoramento === "wild";
+  const naipesReais = cartas.filter((c) => !ehWild(c)).map((c) => c.naipe);
+  if (naipesReais.length === 0) return true; // 5 wilds → flush de qualquer naipe
+  const alvo = naipesReais[0];
+  return cartas.every((c) => ehWild(c) || c.naipe === alvo);
 }
 
 function ehSequencia(cartas) {

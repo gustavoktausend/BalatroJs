@@ -4,6 +4,7 @@ import { detectarMao } from "../js/engine/poker.js";
 
 const carta = (naipe, valor) => ({ id: `${naipe}-${valor}`, naipe, valor });
 const pedra = (naipe, valor) => ({ id: `p-${naipe}-${valor}-${Math.random()}`, naipe, valor, aprimoramento: "pedra" });
+const wild = (naipe, valor) => ({ id: `w-${naipe}-${valor}-${Math.random()}`, naipe, valor, aprimoramento: "wild" });
 
 teste("hands: tabela tem as 9 mãos com valores do spec", () => {
   igual(Object.keys(MAOS).length, 9);
@@ -138,4 +139,17 @@ teste("poker: jogada só de pedras é carta-alta e todas pontuam", () => {
   const m = detectarMao([pedra("copas", 2), pedra("ouros", 3)]);
   igual(m.tipo, "carta-alta");
   igual(m.cartasQuePontuam.length, 2, "as duas pedras pontuam");
+});
+
+teste("poker: wild fecha um flush (4 copas + 1 wild de outro naipe)", () => {
+  const m = detectarMao([
+    carta("copas", 2), carta("copas", 5), carta("copas", 7), carta("copas", 9),
+    wild("paus", 11),
+  ]);
+  igual(m.tipo, "flush");
+});
+
+teste("poker: wild não muda o rank (par continua par, não trinca)", () => {
+  const m = detectarMao([carta("copas", 9), carta("ouros", 9), wild("paus", 11)]);
+  igual(m.tipo, "par");
 });
