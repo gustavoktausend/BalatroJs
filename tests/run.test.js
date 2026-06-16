@@ -198,5 +198,15 @@ teste("run: coringa-ouro paga $4 ao fim da rodada", () => {
   igual(state.dinheiro, 10);
 });
 
+teste("run: o baralho da rodada vem do baralhoRun (aprimoramentos persistem)", () => {
+  const s = criarRun(123);
+  s.baralhoRun[0].aprimoramento = "mult";
+  iniciarBlind(s, "pequena");
+  const total = s.rodada.baralho.length + s.rodada.mao.length;
+  igual(total, 52, "rodada começa com as 52 cartas do baralhoRun");
+  const todas = [...s.rodada.baralho, ...s.rodada.mao];
+  ok(todas.some((c) => c.aprimoramento === "mult"), "o aprimoramento do baralhoRun deve aparecer na rodada");
+});
+
 // limpeza: testes acima gravam save indireto? (jogar/iniciar não salvam — só a UI salva)
 apagarSave();

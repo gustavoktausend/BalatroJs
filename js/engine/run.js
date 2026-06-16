@@ -1,4 +1,4 @@
-import { criarBaralho } from "./deck.js";
+import { copiarBaralho } from "./deck.js";
 import { embaralhar } from "./rng.js";
 import { detectarMao } from "./poker.js";
 import { pontuarJogada, chefeAtivo } from "./scoring.js";
@@ -22,7 +22,7 @@ export function iniciarBlind(state, tipo) {
   const multStake = (STAKES[state.stake] || STAKES.branco).multAlvo;
   state.blindAtual = { tipo, chefeId, alvo: alvoDaBlind(state.ante, tipo, chefeId, multStake) };
   state.rodada = {
-    baralho: embaralhar(state, criarBaralho()),
+    baralho: embaralhar(state, copiarBaralho(state.baralhoRun)),
     mao: [],
     pontuacao: 0,
     maosRestantes: MAOS_POR_BLIND + (state.vouchers.includes("maos-mais") ? 1 : 0) + baralho.maosBonus,
