@@ -1,6 +1,20 @@
+import { ehPedra } from "./deck.js";
+
 // Detecta a melhor mão de pôquer entre 1 a 5 cartas selecionadas.
-// Retorna { tipo, cartasQuePontuam, real } — "real" só interessa na sequência de naipe.
+// Pedras (aprimoramento "pedra") ficam fora da detecção por rank/naipe, mas
+// SEMPRE pontuam: são anexadas a cartasQuePontuam ao final.
 export function detectarMao(cartas) {
+  const pedras = cartas.filter(ehPedra);
+  const jogaveis = cartas.filter((c) => !ehPedra(c));
+  const mao = detectarEntreJogaveis(jogaveis);
+  return { ...mao, cartasQuePontuam: [...mao.cartasQuePontuam, ...pedras] };
+}
+
+// Retorna { tipo, cartasQuePontuam, real } — "real" só interessa na sequência de naipe.
+function detectarEntreJogaveis(cartas) {
+  if (cartas.length === 0) {
+    return { tipo: "carta-alta", real: false, cartasQuePontuam: [] };
+  }
   const contagem = new Map();
   for (const c of cartas) contagem.set(c.valor, (contagem.get(c.valor) || 0) + 1);
   const grupos = [...contagem.entries()]
