@@ -208,5 +208,41 @@ teste("run: o baralho da rodada vem do baralhoRun (aprimoramentos persistem)", (
   ok(todas.some((c) => c.aprimoramento === "mult"), "o aprimoramento do baralhoRun deve aparecer na rodada");
 });
 
+teste("run: carta de vidro que quebra some do baralhoRun", () => {
+  let removeu = false;
+  for (let seed = 1; seed <= 40 && !removeu; seed++) {
+    const s = criarRun(123);
+    iniciarBlind(s, "pequena");
+    s.rngEstado = seed;
+    s.blindAtual.alvo = 10 ** 9; // não vencer a blind, só pontuar
+    s.rodada.maosRestantes = 4;
+    const carta = s.rodada.mao[0];
+    carta.aprimoramento = "vidro";
+    const espelho = s.baralhoRun.find((c) => c.id === carta.id);
+    if (espelho) espelho.aprimoramento = "vidro";
+    const tam = s.baralhoRun.length;
+    jogar(s, [s.rodada.mao.indexOf(carta)]);
+    if (s.baralhoRun.length === tam - 1) removeu = true;
+  }
+  ok(removeu, "em nenhum seed o vidro foi removido do baralhoRun");
+});
+
+teste("run: dinheiroSorte é creditado ao jogador", () => {
+  let creditou = false;
+  for (let seed = 1; seed <= 60 && !creditou; seed++) {
+    const s = criarRun(123);
+    iniciarBlind(s, "pequena");
+    s.rngEstado = seed;
+    s.blindAtual.alvo = 10 ** 9;
+    s.rodada.maosRestantes = 4;
+    const carta = s.rodada.mao[0];
+    carta.aprimoramento = "sorte";
+    const dinheiroAntes = s.dinheiro;
+    jogar(s, [s.rodada.mao.indexOf(carta)]);
+    if (s.dinheiro >= dinheiroAntes + 20) creditou = true;
+  }
+  ok(creditou, "nenhum seed creditou o dinheiro de sorte");
+});
+
 // limpeza: testes acima gravam save indireto? (jogar/iniciar não salvam — só a UI salva)
 apagarSave();

@@ -81,9 +81,14 @@ export function jogar(state, indices) {
   // tiposJogados só recebe o tipo depois, para Trapaceiro/Boca verem o passado.
   const tipo = detectarMao(cartas).tipo;
   state.estatisticas.porMao[tipo] = (state.estatisticas.porMao[tipo] || 0) + 1;
-  const { total, eventos } = pontuarJogada(state, cartas);
+  const { total, eventos, cartasDestruidas, dinheiroSorte } = pontuarJogada(state, cartas);
 
   rodada.pontuacao += total;
+  if (dinheiroSorte) state.dinheiro += dinheiroSorte;
+  if (cartasDestruidas?.length) {
+    const ids = new Set(cartasDestruidas.map((c) => c.id));
+    state.baralhoRun = state.baralhoRun.filter((c) => !ids.has(c.id));
+  }
   rodada.maosRestantes -= 1;
   rodada.tiposJogados.push(tipo);
   state.ultimaMaoJogada = tipo;
