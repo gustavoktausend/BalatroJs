@@ -125,6 +125,10 @@ function vencerBlind(state, eventos) {
     eventos.push({ tipo: "coringa-destruido", id: coringa.id, nome: coringa.def.nome });
   }
 
+  // Ouro: +$3 por carta de ouro que sobrou na mão ao vencer a blind.
+  const ouroNaMao = state.rodada.mao.filter((c) => c.aprimoramento === "ouro").length;
+  if (ouroNaMao) dinheiroExtra += 3 * ouroNaMao;
+
   const tetoJuros = state.vouchers.includes("juros-mais") ? 10 : 5;
   const recompensa = recompensaBlind(tipo, state.rodada.maosRestantes, state.dinheiro, tetoJuros) + dinheiroExtra;
   state.dinheiro += recompensa;

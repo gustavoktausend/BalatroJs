@@ -244,5 +244,19 @@ teste("run: dinheiroSorte é creditado ao jogador", () => {
   ok(creditou, "nenhum seed creditou o dinheiro de sorte");
 });
 
+teste("run: ouro dá +$3 por carta de ouro na mão ao vencer a blind", () => {
+  const s = criarRun(123);
+  iniciarBlind(s, "pequena");
+  s.rodada.mao = [
+    { id: "g1", naipe: "copas", valor: 9, aprimoramento: "ouro" },
+    { id: "g2", naipe: "ouros", valor: 8, aprimoramento: "ouro" },
+    { id: "n1", naipe: "paus", valor: 7, aprimoramento: null },
+  ];
+  s.blindAtual.alvo = 1; // vencer com qualquer jogada
+  const dinheiroAntes = s.dinheiro;
+  jogar(s, [2]); // joga a 'n1'; g1 e g2 (ouro) ficam na mão
+  ok(s.dinheiro >= dinheiroAntes + 6, "duas cartas de ouro na mão deveriam render +$6");
+});
+
 // limpeza: testes acima gravam save indireto? (jogar/iniciar não salvam — só a UI salva)
 apagarSave();
