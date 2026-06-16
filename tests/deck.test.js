@@ -1,5 +1,5 @@
 import { teste, ok, igual } from "./harness.js";
-import { criarBaralho, chipsDaCarta, rotuloDaCarta, ehFigura, NAIPES } from "../js/engine/deck.js";
+import { criarBaralho, chipsDaCarta, rotuloDaCarta, ehFigura, NAIPES, copiarBaralho, ehPedra } from "../js/engine/deck.js";
 
 teste("deck: baralho tem 52 cartas únicas, 13 por naipe", () => {
   const baralho = criarBaralho();
@@ -27,4 +27,25 @@ teste("deck: rótulos e figuras", () => {
   ok(ehFigura({ valor: 12 }));
   ok(!ehFigura({ valor: 14 }), "ás não é figura");
   ok(!ehFigura({ valor: 10 }));
+});
+
+teste("deck: toda carta nasce com aprimoramento null", () => {
+  const b = criarBaralho();
+  ok(b.length === 52);
+  ok(b.every((c) => c.aprimoramento === null), "alguma carta sem campo aprimoramento:null");
+});
+
+teste("deck: copiarBaralho clona as cartas (cópia rasa por carta)", () => {
+  const mestre = criarBaralho();
+  mestre[0].aprimoramento = "mult";
+  const copia = copiarBaralho(mestre);
+  copia[0].aprimoramento = "bonus";
+  igual(mestre[0].aprimoramento, "mult", "mutar a cópia não pode afetar o mestre");
+  igual(copia.length, 52);
+});
+
+teste("deck: ehPedra reconhece só a carta de pedra", () => {
+  ok(ehPedra({ naipe: "copas", valor: 9, aprimoramento: "pedra" }));
+  ok(!ehPedra({ naipe: "copas", valor: 9, aprimoramento: null }));
+  ok(!ehPedra({ naipe: "copas", valor: 9, aprimoramento: "wild" }));
 });
