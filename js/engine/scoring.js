@@ -30,6 +30,7 @@ export function pontuarJogada(state, cartas) {
   let { chips, mult } = valoresDaMao(jogada.tipo, state.niveisMaos[jogada.tipo]);
   const eventos = [{ tipo: "mao", mao: jogada.tipo, nome: MAOS[jogada.tipo].nome, chips, mult }];
   const cartasDestruidas = [];
+  let dinheiroSorte = 0;
   const ctx = { state, jogada, memoria: {} };
 
   const aplicar = (efeito, origem) => {
@@ -62,6 +63,12 @@ export function pontuarJogada(state, cartas) {
         eventos.push({ tipo: "carta-destruida", carta });
       }
     }
+    // Sorte consome RNG da run durante a pontuação: duas rolagens independentes,
+    // nesta ordem (mult 1/5 antes do dinheiro 1/15) — não muda se afetar o RNG.
+    if (carta.aprimoramento === "sorte") {
+      if (entre(state, 1, 5) === 1) aplicar({ mult: 20 }, "aprimoramento:sorte");
+      if (entre(state, 1, 15) === 1) dinheiroSorte += 20;
+    }
     for (const coringa of state.coringas) {
       aplicar(coringa.def.ganchos.aoPontuarCarta?.(carta, { ...ctx, coringa }), coringa.id);
     }
@@ -79,5 +86,5 @@ export function pontuarJogada(state, cartas) {
 
   const total = Math.floor(chips * mult);
   eventos.push({ tipo: "total", total, chips, mult });
-  return { total, eventos, jogada, cartasDestruidas };
+  return { total, eventos, jogada, cartasDestruidas, dinheiroSorte };
 }

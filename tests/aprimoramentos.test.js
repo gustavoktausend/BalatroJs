@@ -81,3 +81,20 @@ teste("aprimoramento vidro: em alguns seeds quebra (entra em cartasDestruidas)",
   ok(quebrou, "nenhum seed quebrou — entre()/probabilidade pode estar errada");
   ok(sobreviveu, "todos quebraram — probabilidade pode estar errada");
 });
+
+teste("aprimoramento sorte: pipeline devolve dinheiroSorte (0 ou múltiplo de 20)", () => {
+  const state = stateBase({ rngEstado: 1 });
+  const r = pontuarJogada(state, [carta("copas", 9, "sorte"), carta("ouros", 9)]);
+  ok(typeof r.dinheiroSorte === "number", "deve devolver dinheiroSorte");
+  ok(r.dinheiroSorte % 20 === 0, `dinheiroSorte deve ser múltiplo de 20, veio ${r.dinheiroSorte}`);
+});
+
+teste("aprimoramento sorte: em alguns seeds concede +20 mult", () => {
+  let concedeu = false;
+  for (let seed = 1; seed <= 40; seed++) {
+    const state = stateBase({ rngEstado: seed });
+    const { eventos } = pontuarJogada(state, [carta("copas", 9, "sorte"), carta("ouros", 9)]);
+    if (eventos.some((e) => e.tipo === "efeito" && e.origem === "aprimoramento:sorte" && e.mult === 20)) concedeu = true;
+  }
+  ok(concedeu, "nenhum seed concedeu +20 mult — probabilidade 1/5 pode estar errada");
+});
