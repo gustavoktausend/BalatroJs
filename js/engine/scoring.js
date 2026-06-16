@@ -2,6 +2,7 @@ import { detectarMao } from "./poker.js";
 import { MAOS, valoresDaMao } from "../data/hands.js";
 import { chipsDaCarta, ehPedra } from "./deck.js";
 import { CHEFES } from "../data/bosses.js";
+import { entre } from "./rng.js";
 
 export function chefeAtivo(state) {
   const blind = state.blindAtual;
@@ -28,6 +29,7 @@ export function pontuarJogada(state, cartas) {
 
   let { chips, mult } = valoresDaMao(jogada.tipo, state.niveisMaos[jogada.tipo]);
   const eventos = [{ tipo: "mao", mao: jogada.tipo, nome: MAOS[jogada.tipo].nome, chips, mult }];
+  const cartasDestruidas = [];
   const ctx = { state, jogada, memoria: {} };
 
   const aplicar = (efeito, origem) => {
@@ -51,6 +53,15 @@ export function pontuarJogada(state, cartas) {
       eventos.push({ tipo: "carta", carta, chips: 0, chipsTotal: chips });
     }
     aplicar(efeitoAprimoramentoNaCarta(carta), `aprimoramento:${carta.aprimoramento}`);
+    // Vidro consome RNG da run durante a pontuação (mesmo padrão do Coringa
+    // Misterioso) — a ORDEM das cartas na jogada afeta o fluxo do RNG.
+    if (carta.aprimoramento === "vidro") {
+      aplicar({ xmult: 2 }, "aprimoramento:vidro");
+      if (entre(state, 1, 4) === 1) {
+        cartasDestruidas.push(carta);
+        eventos.push({ tipo: "carta-destruida", carta });
+      }
+    }
     for (const coringa of state.coringas) {
       aplicar(coringa.def.ganchos.aoPontuarCarta?.(carta, { ...ctx, coringa }), coringa.id);
     }
@@ -68,5 +79,5 @@ export function pontuarJogada(state, cartas) {
 
   const total = Math.floor(chips * mult);
   eventos.push({ tipo: "total", total, chips, mult });
-  return { total, eventos, jogada };
+  return { total, eventos, jogada, cartasDestruidas };
 }

@@ -63,3 +63,21 @@ teste("aprimoramento aco: duas cartas de aço na mão multiplicam duas vezes", (
   const { total } = pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]);
   igual(total, Math.floor(28 * (2 * 1.5 * 1.5)));
 });
+
+teste("aprimoramento vidro: ×2 mult sempre que pontua", () => {
+  const state = stateBase({ rngEstado: 1 });
+  const { total } = pontuarJogada(state, [carta("copas", 9, "vidro"), carta("ouros", 9)]);
+  igual(total, 28 * 4);
+});
+
+teste("aprimoramento vidro: em alguns seeds quebra (entra em cartasDestruidas)", () => {
+  let quebrou = false, sobreviveu = false;
+  for (let seed = 1; seed <= 40; seed++) {
+    const state = stateBase({ rngEstado: seed });
+    const c = carta("copas", 9, "vidro");
+    const r = pontuarJogada(state, [c, carta("ouros", 9)]);
+    if (r.cartasDestruidas.some((d) => d.id === c.id)) quebrou = true; else sobreviveu = true;
+  }
+  ok(quebrou, "nenhum seed quebrou — entre()/probabilidade pode estar errada");
+  ok(sobreviveu, "todos quebraram — probabilidade pode estar errada");
+});
