@@ -245,17 +245,25 @@ teste("run: dinheiroSorte é creditado ao jogador", () => {
 });
 
 teste("run: ouro dá +$3 por carta de ouro na mão ao vencer a blind", () => {
-  const s = criarRun(123);
-  iniciarBlind(s, "pequena");
-  s.rodada.mao = [
-    { id: "g1", naipe: "copas", valor: 9, aprimoramento: "ouro" },
-    { id: "g2", naipe: "ouros", valor: 8, aprimoramento: "ouro" },
-    { id: "n1", naipe: "paus", valor: 7, aprimoramento: null },
-  ];
-  s.blindAtual.alvo = 1; // vencer com qualquer jogada
-  const dinheiroAntes = s.dinheiro;
-  jogar(s, [2]); // joga a 'n1'; g1 e g2 (ouro) ficam na mão
-  ok(s.dinheiro >= dinheiroAntes + 6, "duas cartas de ouro na mão deveriam render +$6");
+  // Isola o efeito do ouro comparando duas vitórias idênticas (mesma seed, mesma
+  // jogada, mesma mão restante) — uma com cartas de ouro, outra sem. A recompensa
+  // base da blind é a mesma nos dois, então a diferença é só o ouro.
+  const vencerCom = (aprimoramento) => {
+    const s = criarRun(123);
+    iniciarBlind(s, "pequena");
+    s.rodada.mao = [
+      { id: "g1", naipe: "copas", valor: 9, aprimoramento },
+      { id: "g2", naipe: "ouros", valor: 8, aprimoramento },
+      { id: "n1", naipe: "paus", valor: 7, aprimoramento: null },
+    ];
+    s.blindAtual.alvo = 1; // vencer com qualquer jogada
+    const dinheiroAntes = s.dinheiro;
+    jogar(s, [2]); // joga a 'n1'; g1 e g2 ficam na mão para o ouro contar
+    return s.dinheiro - dinheiroAntes;
+  };
+  const comOuro = vencerCom("ouro");
+  const semOuro = vencerCom(null);
+  igual(comOuro - semOuro, 6, "duas cartas de ouro na mão devem render exatamente +$6");
 });
 
 // limpeza: testes acima gravam save indireto? (jogar/iniciar não salvam — só a UI salva)
