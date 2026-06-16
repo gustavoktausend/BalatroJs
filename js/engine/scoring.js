@@ -56,6 +56,12 @@ export function pontuarJogada(state, cartas) {
     }
   }
 
+  // Aço: ×1,5 mult por carta de aço SEGURADA na mão (não precisa ser jogada).
+  const mao = state.rodada?.mao ?? [];
+  for (const cartaMao of mao) {
+    if (cartaMao.aprimoramento === "aco") aplicar({ xmult: 1.5 }, "aprimoramento:aco");
+  }
+
   for (const coringa of state.coringas) {
     aplicar(coringa.def.ganchos.aoPontuarMao?.({ ...ctx, coringa }), coringa.id);
   }

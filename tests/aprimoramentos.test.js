@@ -49,3 +49,17 @@ teste("aprimoramento pedra: +50 chips e não soma chips por rank", () => {
   const { total } = pontuarJogada(state, [carta("copas", 9), carta("ouros", 9), carta("paus", 2, "pedra")]);
   igual(total, (28 + 50) * 2);
 });
+
+teste("aprimoramento aco: ×1,5 mult por carta de aço na mão (mesmo sem jogar)", () => {
+  const naMao = [carta("paus", 7, "aco"), carta("espadas", 3)];
+  const state = stateBase({ rodada: { ...stateBase().rodada, mao: naMao } });
+  const { total } = pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]);
+  igual(total, Math.floor(28 * (2 * 1.5)));
+});
+
+teste("aprimoramento aco: duas cartas de aço na mão multiplicam duas vezes", () => {
+  const naMao = [carta("paus", 7, "aco"), carta("espadas", 3, "aco")];
+  const state = stateBase({ rodada: { ...stateBase().rodada, mao: naMao } });
+  const { total } = pontuarJogada(state, [carta("copas", 9), carta("ouros", 9)]);
+  igual(total, Math.floor(28 * (2 * 1.5 * 1.5)));
+});
