@@ -128,6 +128,40 @@ opus). Merge `--no-ff` em `main`, branch apagada, push.
 
 Testes após o lote: `node tests/todos.js` → **134 teste(s), 0 falha(s)**.
 
+## Aprimoramentos de carta — Sub-etapa A (núcleo) — CONCLUÍDA (2026-06-16)
+
+Item 🎯 P1 da auditoria de paridade — o sistema de modificação de carta de maior
+impacto, decomposto em **A (núcleo)**, B (fontes: tarôs/pacote) e C (visual). Esta
+frente entregou o **A**. Frente em `feat/aprimoramentos-carta-nucleo` (spec
+`docs/superpowers/specs/2026-06-16-aprimoramentos-carta-nucleo-design.md`, plano
+`docs/superpowers/plans/2026-06-16-aprimoramentos-carta-nucleo.md`). Workflow
+subagent-driven (implementador haiku/sonnet → revisor spec sonnet nas tasks de engine →
+revisão final opus). 12 tasks TDD.
+
+- **Campo `aprimoramento` na carta** (`deck.js`); helpers `copiarBaralho`/`ehPedra`.
+- **Baralho-mestre da run persistente** `state.baralhoRun` — peça que faltava: antes
+  cada blind recriava o baralho do zero. `iniciarBlind` embaralha uma cópia. Bump
+  `VERSAO_SAVE 4 → 5` (sem migração; saves antigos descartados).
+- **8 aprimoramentos:** bonus (+30 chips), mult (+4), pedra (+50, sempre pontua, fora
+  da detecção por rank/naipe — `poker.js`), wild (qualquer naipe no flush — `poker.js`),
+  vidro (×2 mult, 1/4 de quebrar e ser destruída do `baralhoRun`), aço (×1,5 por carta
+  SEGURADA na mão), ouro (+$3 por carta na mão no fim da rodada), sorte (1/5 +20 mult,
+  1/15 +$20). Pipeline em `scoring.js`; vidro/sorte rolam RNG na pontuação (padrão do
+  Coringa Misterioso). `pontuarJogada` devolve `cartasDestruidas` e `dinheiroSorte`,
+  consumidos em `run.js`.
+- **Prova viva:** tarô "O Mago" (`taros.js`) aplica Mult a até 2 cartas (mão ou
+  baralhoRun, persistindo no mestre). Sem UI de seleção ainda (vem na Sub-etapa B).
+- Achados da revisão final (opus) corrigidos: **aço só conta cartas seguradas**, não as
+  jogadas (a mão ainda contém as jogadas no momento da pontuação — fidelidade ao
+  Balatro); reforço do teste de ouro (isola +$6 com/sem) e teste de round-trip do
+  `baralhoRun` no save.
+
+**Fora de escopo (próximas sub-etapas):** B — tarôs/espectrais que aplicam
+aprimoramentos com seleção interativa + pacote Padrão de cartas; C — visual das cartas
+(cor/badge/brilho), tooltips, animação do evento `carta-destruida` (já emitido).
+
+Testes após a Sub-etapa A: `node tests/todos.js` → **163 teste(s), 0 falha(s)**.
+
 ## Convenções (não esquecer nos prompts dos subagentes)
 
 - Código/comentários em português; zero dependências; ES modules sem build.
